@@ -23,7 +23,7 @@ extern int   opterr;
 #define MM_OP_DECODE  2
 
 int usage(char *, int);
-int get_operation(char *);
+int pick_operation(char *);
 
 
 int main(int argc, char *argv[])
@@ -31,8 +31,16 @@ int main(int argc, char *argv[])
   options_t options = OPTIONS_INIT;
   int opt;
   int retval;
+  int op;
 
   opterr = 0;
+
+  if ((op = pick_operation(argv[0])) == MM_OP_INVALID) {
+    errno = EINVAL;
+    perror("meow/unmeow argv[0] unrecognized!");
+    exit(-1);
+    /* NOTREACHED */
+  }
   
   while( (opt=getopt(argc, argv, OPTARG)) != EOF)
     switch(opt) {
@@ -73,7 +81,7 @@ int main(int argc, char *argv[])
 	break;
     }
 
-  switch(get_operation(argv[0])) {
+  switch(op) {
     case MM_OP_ENCODE:
       retval = mm_encode(options.in_stream, options.out_stream, options.verbose);
       break;
@@ -109,23 +117,22 @@ int usage(char *argv0, int opt)
 }
 
 
-int get_operation(char *argv0)
+int pick_operation(char *argv0)
 {
+  char *name;
+  
   if (!argv0) {
     errno = EINVAL;
     return MM_OP_INVALID;
   }
   
-  switch(basename(argv0)[0]) {
-    case 'm':
+  name = basename(argv0);
+
+  if (strncmp(name, CMD_MEOW, strlen(CMD_MEOW)) == 0)
       return MM_OP_ENCODE;
-      /* NOTREACHED */
-    case 'u':
-      return MM_OP_DECODE;
-      /* NOTREACHED */
-    default:
-      break;
-  }
+
+  if (strncmp(name, CMD_UNMEOW, strlen(CMD_UNMEOW)) == 0)
+      return MM_OP_ENCODE;  
   
   return MM_OP_INVALID;
 }
