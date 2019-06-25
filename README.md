@@ -16,9 +16,9 @@ C program together.
 
 The first thing to know about this C program is that it's a [UNIX][2]
 command-line tool. This means that it runs on, or can be ported to,
-operating systems that provide a C run-time environment. When UNIX
-was first invented at Bell Labs, it was imbued from the beginning
-with a philosophy: tools do one thing, do it well and act on files.
+operating systems that provide a UNIX C run-time environment. When
+UNIX was first invented at Bell Labs, it was imbued from the beginning
+with a philosophy: programs do one thing, do it well and act on files.
 While it makes sense to do one thing and do it well, the part about
 acting on files may seem like a head-scratcher.
 
@@ -46,21 +46,21 @@ in a command shell like ```bash```:
    $ ls | grep foo | sed -e 's/bar/baz/g' > ack
 ```
 
-Quickly, the output of ```ls``` is written to stdout which is
+Briefly, the output of ```ls``` is written to stdout which is
 redirected to the stdin of ```grep``` whose stdout is redirected
 to ```sed``` whose stdout is redirected to write to a file called
 'ack' in the current directory.
 
 We want our program to play well in this ecosystem of equally flexible
-and awesome programs, so lets get to it. 
+and awesome programs, so lets write a program that reads and writes files. 
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
-When I was a dewy-eyed kid studying computer science, there were an
-actual plethora of encoding schemes. Some of them were for compressing
-files, some were for packaging files together and others had no
-purpose but to be excrutiatingly silly. An example of the last is the
-[MooMoo encoding scheme][3].
+When I was a dewy-eyed kid studying computer science in the <mumbles>,
+there were an actual plethora of encoding schemes. Some of them were
+for compressing files, some were for packaging files together and
+others had no purpose but to be excrutiatingly silly. An example of
+the last is the [MooMoo encoding scheme][3].
 
 For our example, I'll update this concept for the [2000s][4] and implement
 a MeowMeow encoding since the Internet loves cats. The basic idea here is
@@ -70,7 +70,7 @@ size of a file since we are trading a single bit for eight bits. Yes it's
 pointless. But imagine the surpise on someone's face when this happens:
 
 ```
-   $ cat /home/you/.super_secret_journal_of_my_innermost_thoughts
+   $ cat /home/your_sibling/.super_secret_journal_of_my_innermost_thoughts
    MeOWmeOWmeowMEoW...
 ```
 
@@ -78,8 +78,9 @@ This is going to be awesome.
 
 ### Implementation, Finally
 
-The full source for this can be found on [my GitHub][5] but I'm going
-to talk through my thought process while writing it.
+The full source for this can be found on [GitHub][5] but I'm going to
+talk through my thought process while writing it. The object here is
+to illustrate how to write a C program composed of multiple files.
 
 Having already established that I want to write a program that encodes
 and decodes files in MeowMeow format, I fired up a shell and issued the
@@ -108,42 +109,45 @@ from it's name. Just in case you can't, I annotated each ```touch```
 with a brief description.
 
 So normally a program starts as a ```main.c``` that is simple, with only two
-or three functions that solve the problem. And then the programmer stupidly
+or three functions that solve the problem. And then the programmer rashly
 shows that program to a friend or her boss and suddenly the number of functions
 in the file balloons to support all the new "features" and "requirements"
 that pop up. First rule of "Program Club" is don't talk about "Program Club".
+The second rule is minimize the number of functions in one file.
 
 Now the C compiler does not care one little bit if every function in
 your program is in one file. But we don't write programs for computers
-or compilers, we right them for other people. I know that is probably
-a surprise, but it's true. A program embodies a set of algorithms that
-solve a problem with a computer, and it's important that people
-understand it when the parameters of the problem change in
-unanticipated ways. People will have to modify the program and they
-will curse your name if you have all 2049 functions in one file. And
-will probably try to hunt you down to make you make the changes.
+or compilers, we write them for other people (who are sometimes us). I
+know that is probably a surprise, but it's true. A program embodies a
+set of algorithms that solve a problem with a computer, and it's
+important that people understand it when the parameters of the problem
+change in unanticipated ways. People will have to modify the program
+and they will curse your name if you have all 2049 functions in one
+file.
 
-So we break functions out, grouping like functions into seperate
-files. Here I've got files **```main.c```**, **```mmencode.c```**, and
-**```mmdecode.c```**. For small programs like this, it may seem like
-overkill. But small programs rarely stay small, so planning for
-expansion is a "Good Idea™".
+So we good and true programmers break functions out, grouping like
+functions into seperate files. Here I've got files **```main.c```**,
+**```mmencode.c```**, and **```mmdecode.c```**. For small programs
+like this, it may seem like overkill. But small programs rarely stay
+small, so planning for expansion is a "Good Idea™".
 
 But what about those ```.h``` files? I'll explain them in detail
 later, but in brief those are called _header_ files and they generally
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
 
+### 
 
 
 
 
 
+<!- XXX this could be a good outro (sentiment, if not wording) -->
 
-
-
-
-
+This article would have turned into a very boring book if I try to describe
+every line of every file, so some things I chose to gloss over. Leave me
+comments to let me know how bad my choices were and where my next article
+should take us.
 
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
 [2]: https://FIXME/link_to_posix_unix_def?
