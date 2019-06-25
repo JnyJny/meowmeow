@@ -7,10 +7,10 @@ boxes".
 
 In this article I'll name some things and manage some complexity while
 writing a small C program that is loosely based on the structure I
-introduced discussing [another C program][1], but different in that it
-will do something. Grab your favorite beverage, your favorite editor
-and compiler, crank up some tunes and let's write a mildly interesting
-C program together.
+[discussed earlier][1], but different. This one will do
+something. Grab your favorite beverage, your favorite editor and
+compiler, crank up some tunes and let's write a mildly interesting C
+program together.
 
 ### Philosophy of A Good UNIX C Program
 
@@ -22,20 +22,20 @@ with a philosophy: programs do one thing, do it well and act on files.
 While it makes sense to do one thing and do it well, the part about
 acting on files may seem like a head-scratcher.
 
-It turns out that the abstraction of a "file" is very powerful. A UNIX
-file is a stream of bytes that ends with an End Of File (EOF)
-marker. Any other structure in a file is imposed by the application
-and not the operating system. The operating system provides system
-calls which allow a program to perform a set of standard operations on
-files: open, read, write, seek, fcntl, and close. Standardizing access
-to files allows different programs to share a common abstraction and
-work together even when they were implemented by different people in
-possibly different languages.
+It turns out that the UNIX abstraction of a "file" is very powerful. A
+UNIX file is a stream of bytes that ends with an End Of File (EOF)
+marker. That's it. Any other structure in a file is imposed by the
+application and not the operating system. The operating system
+provides system calls which allow a program to perform a set of
+standard operations on files: open, read, write, seek, fcntl, and
+close. Standardizing access to files allows different programs to
+share a common abstraction and work together even when they were
+implemented by different people in possibly different languages.
 
 Having a shared file interface makes it possible to build programs
 that are composable. The output of one program can be the input of
 another program. The UNIX family of operating systems provides
-three files by default every time a program is executed:
+three files by default whenever a program is executed:
 standard in (```stdin```), standard out (```stdout```) and standard
 error (```stderr```). Two of these files are opened in write-only
 mode; ```stdout``` and ```stderr```, while ```stdin``` is opened
@@ -46,17 +46,17 @@ in a command shell like ```bash```:
    $ ls | grep foo | sed -e 's/bar/baz/g' > ack
 ```
 
-Briefly, the output of ```ls``` is written to stdout which is
-redirected to the stdin of ```grep``` whose stdout is redirected
-to ```sed``` whose stdout is redirected to write to a file called
-'ack' in the current directory.
+This construction can be described briefly as; the output of ```ls```
+is written to stdout which is redirected to the stdin of ```grep```
+whose stdout is redirected to ```sed``` whose stdout is redirected to
+write to a file called 'ack' in the current directory.
 
 We want our program to play well in this ecosystem of equally flexible
 and awesome programs, so lets write a program that reads and writes files. 
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
-When I was a dewy-eyed kid studying computer science in the &lt;mumbles&gt;,
+When I was a dewy-eyed kid studying computer science in the &lt;mumbles&gt;'s,
 there were an actual plethora of encoding schemes. Some of them were
 for compressing files, some were for packaging files together and
 others had no purpose but to be excrutiatingly silly. An example of
@@ -80,7 +80,7 @@ This is going to be awesome.
 
 The full source for this can be found on [GitHub][5] but I'm going to
 talk through my thought process while writing it. The object here is
-to illustrate how to write a C program composed of multiple files.
+to illustrate how to struture a C program composed of multiple files.
 
 Having already established that I want to write a program that encodes
 and decodes files in MeowMeow format, I fired up a shell and issued the
@@ -140,14 +140,15 @@ directives. Header files should **not** have any functions in them.
 ### What The Heck is a Makefile?
 
 I know all you cool kids are using the "Ultra CodeShredder 3000"
-integrated development environment (IDE) to write the next blockbuster
-app written in Qlang and building your project consists of mashing on
-"Ctrl-Meta-Shift-B". But back in my day (and also today), lots of useful
-work gets down by programs built with Makefiles. A Makefile is a text
-file that contains recipes for working with files and programmers
-generally use it for building their program binaries from source. Makefiles
-can be used to automate just about anything, but their original purpose
-was building programs from source.
+integrated development environment to write the next blockbuster app
+written in a boutique languge for a curated marketplace and building
+your project consists of mashing on "Ctrl-Meta-Shift-B". But back in
+my day (and also today), lots of useful work gets done by programs
+built with Makefiles. A Makefile is a text file that contains recipes
+for working with files and programmers generally use it for building
+their program binaries from source. Makefiles can be used to automate
+just about anything, but their original purpose was building programs
+from source.
 
 For instance, this little gem:
 
@@ -180,12 +181,14 @@ The Makefile that will build our MeowMeow encoder/decoder is
 considerably more sophisticated than this example, but the basic
 structure is the same. Some targets create real files, some targets
 are 'phony' since they don't create a specific file but act as a sort
-of alias. I smell another article here about writing Makefiles.
+of alias. I smell another article here about writing Makefiles. Before
+I forget, the GNU Make command has excellent [documentation][6].
 
 ### Form Follows Function
 
-So the idea here is to write a program that reads a file, transforms
-it and then writes it to another file.
+The idea here is to write a program that reads a file, transforms
+it and then writes it to another file. The following fabricated
+command-line interaction is how imagine using the program:
 
 ```bash
 	$ meow -i clear_text -o meow_text
@@ -194,9 +197,9 @@ it and then writes it to another file.
 	no diff
 ```
 
-So we need to write code to handle command-line parsing and managing
-the input and output streams. We'll need code to encode a stream and
-write it to another stream. And finally we'll need code to decode a
+We need to write code to handle command-line parsing and managing
+the input and output streams. We'll need a function to encode a stream and
+write it to another stream. And finally we'll need a function to decode a
 stream and write it to another stream. Wait a second, I've only been
 talking about writing one program but in the example above I 
 call ```meow``` and ```unmeow```? 
@@ -218,7 +221,7 @@ like two programs, but in fact are one program with two names
 in the file system. The two-name trick is accomplished by creating
 a file system "link" using the ```ln``` command.
 
-An example from my /usr/bin on MacOS 10.14.5 is:
+An example from ```/usr/bin``` on my laptop is:
 ```bash
    $ ls -li /usr/bin/git*
 3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/git
@@ -240,31 +243,55 @@ the value of ```argv[0]``` and then we make sure to create links
 
 Things are getting complex for sure, but it's managed.
 
-### The ```main``` Function
+### Exploring ```main.c```
 
-The structure of the ```main.c``` file for ```meow```/```unmeow``` should be
-familiar to my [long-time readers][1]. In brief, the file has the
+The structure of the ```main.c``` file for ```meow```/```unmeow```
+should be familiar to my [long-time readers][1], and has the
 following general outline:
 
 ```C
    /* main.c - MeowMeow, a stream encoder/decoder */
    /* 00 system includes */
    /* 01 project includes */
-   /* 02 defines */
-   /* 03 typedefs */
-   /* 04 globals (but don't)*/
-   /* 05 ancillary function prototypes if any */
+   /* 02 externs */
+   /* 03 defines */
+   /* 04 typedefs */
+   /* 05 globals (but don't)*/
+   /* 06 ancillary function prototypes if any */
    
    int main(int argc, char *argv[])
    {
-       /* 06 variable declarations */
-	   /* 07 check argv[0] to see how the program was invoked */
-       /* 08 process the command line options from the user */
-	   /* 09 do the needful */
+       /* 07 variable declarations */
+	   /* 08 check argv[0] to see how the program was invoked */
+       /* 09 process the command line options from the user */
+	   /* 10 do the needful */
    }
    
-   /* 10 ancillary functions if any */
+   /* 11 ancillary functions if any */
 ```
+
+### Including Header Files
+
+The second section, ```01 project includes``` reads like this from the source:
+
+```C
+   /* main.c - MeowMeow, a stream encoder/decoder */
+   ...
+   /* 01 project includes */
+   #include "main.h"
+   #include "mmecode.h"
+   #include "mmdecode.h"
+```
+
+The ```#include``` directive is a C pre-processor command that causes
+the contents of the named file to be "included" at this point in the file.
+If the programmer uses double-quotes around the name of the header file,
+the compiler will look for that file in the current directory. If the file
+is enclosed in &lt;&gt;, it will look for the file in a set of predefined
+directories. There is a lot unpack in those header files, enough for a
+whole 'nother article.
+
+
 
 
 
@@ -289,3 +316,4 @@ how bad my choices were and where my next article should take us.
 [3]: http://www.jabberwocky.com/software/moomooencode.html
 [4]: https://FIXME/link_to_nyan_cat_gif
 [5]: https://github.com/JnyJny/meowmeow.git
+[6]: https:///FIXME/make_documentation
