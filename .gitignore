@@ -1,2 +1,5 @@
 *~
 #*
+*.o
+meow
+unmeow
