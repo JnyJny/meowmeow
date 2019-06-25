@@ -6,8 +6,8 @@ largely true with the addition of "and sometimes it requires drawing
 boxes". 
 
 In this article I'll name some things and manage some complexity while
-writing a small C program that is loosely based on the structure I
-[discussed earlier][1], but different. This one will do
+writing a small C program that is loosely based on the program
+structure I [discussed earlier][1], but different. This one will do
 something. Grab your favorite beverage, your favorite editor and
 compiler, crank up some tunes and let's write a mildly interesting C
 program together.
@@ -18,22 +18,23 @@ The first thing to know about this C program is that it's a [UNIX][2]
 command-line tool. This means that it runs on, or can be ported to,
 operating systems that provide a UNIX C run-time environment. When
 UNIX was first invented at Bell Labs, it was imbued from the beginning
-with a philosophy: programs do one thing, do it well and act on files.
-While it makes sense to do one thing and do it well, the part about
-acting on files may seem like a head-scratcher.
+with a design philosophy: programs do one thing, do it well and act on
+files.  While it makes sense to do one thing and do it well, the part
+about acting on files seems a little out of place. 
 
 It turns out that the UNIX abstraction of a "file" is very powerful. A
 UNIX file is a stream of bytes that ends with an End Of File (EOF)
 marker. That's it. Any other structure in a file is imposed by the
 application and not the operating system. The operating system
 provides system calls which allow a program to perform a set of
-standard operations on files: open, read, write, seek, fcntl, and
-close. Standardizing access to files allows different programs to
-share a common abstraction and work together even when they were
-implemented by different people in possibly different languages.
+standard operations on files: open, read, write, seek, and close
+(there are others but those are the biggies). Standardizing access to
+files allows different programs to share a common abstraction and work
+together even when they were implemented by different people in
+possibly different languages.
 
 Having a shared file interface makes it possible to build programs
-that are composable. The output of one program can be the input of
+that are **composable**. The output of one program can be the input of
 another program. The UNIX family of operating systems provides
 three files by default whenever a program is executed:
 standard in (```stdin```), standard out (```stdout```) and standard
@@ -52,7 +53,7 @@ whose stdout is redirected to ```sed``` whose stdout is redirected to
 write to a file called 'ack' in the current directory.
 
 We want our program to play well in this ecosystem of equally flexible
-and awesome programs, so lets write a program that reads and writes files. 
+and awesome programs, so lets write a program that reads and writes files.
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
@@ -62,12 +63,14 @@ for compressing files, some were for packaging files together and
 others had no purpose but to be excrutiatingly silly. An example of
 the last is the [MooMoo encoding scheme][3].
 
-For our example, I'll update this concept for the [2000s][4] and implement
-a MeowMeow encoding since the Internet loves cats. The basic idea here is
-to take files and encode each byte with the text "meow". A lower-case letter
-indicates a zero and upper-case indicates a one. Yes, it will balloon the
-size of a file since we are trading a single bit for eight bits. Yes it's
-pointless. But imagine the surpise on someone's face when this happens:
+For our example, I'll update this concept for the [2000s][4] and
+implement a MeowMeow encoding since the Internet loves cats. The basic
+idea here is to take files and encode each nibble (half of a byte)
+with the text "meow". A lower-case letter indicates a zero and
+upper-case indicates a one. Yes, it will balloon the size of a file
+since we are trading a four bits for 32 bits. Yes, it's
+pointless. But imagine the surpise on someone's face when this
+happens:
 
 ```
    $ cat /home/your_sibling/.super_secret_journal_of_my_innermost_thoughts
@@ -109,22 +112,23 @@ Even though the files are empty, you can infer the purpose of each
 from it's name. Just in case you can't, I annotated each ```touch```
 with a brief description.
 
-So normally a program starts as a ```main.c``` that is simple, with only two
-or three functions that solve the problem. And then the programmer rashly
-shows that program to a friend or her boss and suddenly the number of functions
-in the file balloons to support all the new "features" and "requirements"
-that pop up. First rule of "Program Club" is don't talk about "Program Club".
-The second rule is minimize the number of functions in one file.
+So normally a program starts as a single ```main.c``` file that is
+simple, with only two or three functions that solve the problem. And
+then the programmer rashly shows that program to a friend or her boss
+and suddenly the number of functions in the file balloons to support
+all the new "features" and "requirements" that pop up. First rule of
+"Program Club" is don't talk about "Program Club".  The second rule is
+minimize the number of functions in one file.
 
-Now the C compiler does not care one little bit if every function in
-your program is in one file. But we don't write programs for computers
-or compilers, we write them for other people (who are sometimes us). I
-know that is probably a surprise, but it's true. A program embodies a
-set of algorithms that solve a problem with a computer, and it's
-important that people understand it when the parameters of the problem
-change in unanticipated ways. People will have to modify the program
-and they will curse your name if you have all 2049 functions in one
-file.
+To be honest, the C compiler does not care one little bit if every
+function in your program is in one file. But we don't write programs
+for computers or compilers, we write them for other people (who are
+sometimes us). I know that is probably a surprise, but it's true. A
+program embodies a set of algorithms that solve a problem with a
+computer, and it's important that people understand it when the
+parameters of the problem change in unanticipated ways. People will
+have to modify the program and they will curse your name if you have
+all 2049 functions in one file.
 
 So we good and true programmers break functions out, grouping like
 functions into seperate files. Here I've got files **```main.c```**,
@@ -132,7 +136,7 @@ functions into seperate files. Here I've got files **```main.c```**,
 like this, it may seem like overkill. But small programs rarely stay
 small, so planning for expansion is a "Good Idea™".
 
-But what about those ```.h``` files? I'll explain them in detail
+But what about those ```.h``` files? I'll explain them in general terms
 later, but in brief those are called _header_ files and they generally
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
@@ -141,18 +145,17 @@ directives. Header files should **not** have any functions in them.
 
 I know all you cool kids are using the "Ultra CodeShredder 3000"
 integrated development environment to write the next blockbuster app
-written in a boutique languge for a curated marketplace and building
-your project consists of mashing on "Ctrl-Meta-Shift-B". But back in
-my day (and also today), lots of useful work gets done by programs
-built with Makefiles. A Makefile is a text file that contains recipes
-for working with files and programmers generally use it for building
-their program binaries from source. Makefiles can be used to automate
-just about anything, but their original purpose was building programs
-from source.
+and building your project consists of mashing on
+"Ctrl-Meta-Shift-Alt-Super-B". But back in my day (and also today), lots of
+useful work got done by C programs built with Makefiles. A Makefile is
+a text file that contains recipes for working with files and
+programmers generally use it to automate building their program
+binaries from source.
 
 For instance, this little gem:
 
-```00 # Makefile
+```Makefile
+   00 # Makefile
    01 my_sweet_program: main.c
    02    cc -o my_sweet_program main.c
 ```
@@ -163,10 +166,10 @@ Line 01 consists of the name of the file that the recipe creates
 and the files it depends on. In this case the target is ```my_sweet_program```
 and the dependency is ```main.c```.
 
-The final line, 02, is indented with an honest-to-Crom tab (not four spaces)
-and is the command (or set of commands ) that will be executed to create the
-target. In this case, we call ```cc``` the C compiler front-end to compile
-and link ```my_sweet_program```.
+The final line, 02, is indented with an honest-to-Crom tab, not four
+spaces, and is the command that will be executed to create the
+target. In this case, we call ```cc``` the C compiler front-end to
+compile and link ```my_sweet_program```.
 
 Using a Makefile is simple:
 
@@ -191,8 +194,8 @@ it and then writes it to another file. The following fabricated
 command-line interaction is how imagine using the program:
 
 ```bash
-	$ meow -i clear_text -o meow_text
-	$ unmeow -i meow_text -o new_clear_text
+	$ meow < clear_text > meow_text
+	$ unmeow < meow_text > new_clear_text
 	$ diff clear_text new_clear_text
 	no diff
 ```
@@ -201,8 +204,9 @@ We need to write code to handle command-line parsing and managing
 the input and output streams. We'll need a function to encode a stream and
 write it to another stream. And finally we'll need a function to decode a
 stream and write it to another stream. Wait a second, I've only been
-talking about writing one program but in the example above I 
-call ```meow``` and ```unmeow```? 
+talking about writing one program but in the example above I
+call ```meow``` and ```unmeow```? I know you are probably thinking
+that this is getting complex as heck.
 
 ### Minor Side Track - ```argv[0]``` and the ```ln``` command
 
@@ -261,18 +265,18 @@ following general outline:
    
    int main(int argc, char *argv[])
    {
-       /* 07 variable declarations */
-	   /* 08 check argv[0] to see how the program was invoked */
-       /* 09 process the command line options from the user */
-	   /* 10 do the needful */
+     /* 07 variable declarations */
+     /* 08 check argv[0] to see how the program was invoked */
+     /* 09 process the command line options from the user */
+     /* 10 do the needful */
    }
    
    /* 11 ancillary functions if any */
 ```
 
-### Including Header Files
+### Including Project Header Files
 
-The second section, ```01 project includes``` reads like this from the source:
+The second section, ```/* 01 project includes /*``` reads like this from the source:
 
 ```C
    /* main.c - MeowMeow, a stream encoder/decoder */
@@ -288,8 +292,59 @@ the contents of the named file to be "included" at this point in the file.
 If the programmer uses double-quotes around the name of the header file,
 the compiler will look for that file in the current directory. If the file
 is enclosed in &lt;&gt;, it will look for the file in a set of predefined
-directories. There is a lot unpack in those header files, enough for a
+directories. There is a lot to unpack in those header files, enough for a
 whole 'nother article.
+
+The file ```main.h``` contains definitions and typedefs that are used
+in ```main.c```.
+
+The files ```mmencode.h``` and ```mmdecode.h``` are nearly identical
+so I'll break down ```mmencode.h```:
+
+```C
+    /* mmencode.h - MeowMeow, a stream encoder/decoder */
+    
+    #ifndef _MMENCODE_H
+    #define _MMENCODE_H
+    
+    #include <stdio.h>
+    
+    int mm_encode(FILE *src, FILE *dst, int verbose);
+    
+    #endif	/* _MMENCODE_H */
+```
+
+The ```#ifdef```, ```#define```, ```#endif``` construction is
+collectively known as a "guard". This keeps the C compiler from
+including this file more than once. The compiler will complain if it
+finds multiple definitions/prototypes/declarations so the guard is a
+**must have** for header files.
+
+Inside the guard, there are only two things: a ```#include```
+directive and a function prototype declaration. I include ```stdio.h```
+here to bring in the definition of ```FILE``` which is used in
+the function prototype. The function prototype can be included
+by other C files to establish that function in the file's namespace.
+Yup, namespace is another explanation, deferred.
+
+By including them in ```main.c``` it allows us to call the
+functions ```mm_encode``` and ```mm_decode``` without the compiler
+assuming the default function prototype. which is
+
+<!- EJO double check this ->
+```C
+    int ()(void);
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
