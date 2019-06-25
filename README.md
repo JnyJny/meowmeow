@@ -56,7 +56,7 @@ and awesome programs, so lets write a program that reads and writes files.
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
-When I was a dewy-eyed kid studying computer science in the <mumbles>,
+When I was a dewy-eyed kid studying computer science in the &lt;mumbles&gt;,
 there were an actual plethora of encoding schemes. Some of them were
 for compressing files, some were for packaging files together and
 others had no purpose but to be excrutiatingly silly. An example of
@@ -92,6 +92,7 @@ following commands:
    $ git init
    $ touch Makefile     # recipes for compiling the program
    $ touch main.c       # handles command-line options
+   $ touch main.h       # "global" constants and definitions
    $ touch mmencode.c   # implements encoding a MeowMeow file
    $ touch mmencode.h   # describes the encoding API
    $ touch mmdecode.c   # implements decoding a MeowMeow file
@@ -102,7 +103,7 @@ following commands:
    $ git commit -m "initial commit of empty files"
 ```
 
-In short, I created directory full of empty files and committed them to git. 
+In short, I created a directory full of empty files and committed them to git. 
 
 Even though the files are empty, you can infer the purpose of each
 from it's name. Just in case you can't, I annotated each ```touch```
@@ -136,7 +137,141 @@ later, but in brief those are called _header_ files and they generally
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
 
-### 
+### What The Heck is a Makefile?
+
+I know all you cool kids are using the "Ultra CodeShredder 3000"
+integrated development environment (IDE) to write the next blockbuster
+app written in Qlang and building your project consists of mashing on
+"Ctrl-Meta-Shift-B". But back in my day (and also today), lots of useful
+work gets down by programs built with Makefiles. A Makefile is a text
+file that contains recipes for working with files and programmers
+generally use it for building their program binaries from source. Makefiles
+can be used to automate just about anything, but their original purpose
+was building programs from source.
+
+For instance, this little gem:
+
+```00 # Makefile
+   01 my_sweet_program: main.c
+   02    cc -o my_sweet_program main.c
+```
+
+Text after an octothorpe/pound/hash is a comment, like line 00.
+
+Line 01 consists of the name of the file that the recipe creates
+and the files it depends on. In this case the target is ```my_sweet_program```
+and the dependency is ```main.c```.
+
+The final line, 02, is indented with an honest-to-Crom tab (not four spaces)
+and is the command (or set of commands ) that will be executed to create the
+target. In this case, we call ```cc``` the C compiler front-end to compile
+and link ```my_sweet_program```.
+
+Using a Makefile is simple:
+
+```bash
+   $ make
+   cc -o my_sweet_program main.c
+   $ ls 
+   Makefile  main.c  my_sweet_program
+```
+
+The Makefile that will build our MeowMeow encoder/decoder is
+considerably more sophisticated than this example, but the basic
+structure is the same. Some targets create real files, some targets
+are 'phony' since they don't create a specific file but act as a sort
+of alias. I smell another article here about writing Makefiles.
+
+### Form Follows Function
+
+So the idea here is to write a program that reads a file, transforms
+it and then writes it to another file.
+
+```bash
+	$ meow -i clear_text -o meow_text
+	$ unmeow -i meow_text -o new_clear_text
+	$ diff clear_text new_clear_text
+	no diff
+```
+
+So we need to write code to handle command-line parsing and managing
+the input and output streams. We'll need code to encode a stream and
+write it to another stream. And finally we'll need code to decode a
+stream and write it to another stream. Wait a second, I've only been
+talking about writing one program but in the example above I 
+call ```meow``` and ```unmeow```? 
+
+### Minor Side Track - ```argv[0]``` and the ```ln``` command
+
+If you recall, the signature of a C main function is:
+
+```C
+int main(int argc, char *argv[])
+```
+
+where ```argc``` is the number of command line arguments
+and ```argv``` is a list of character pointers (strings).
+The value of ```argv[0]``` is the path of the file containing
+the program being executed. Many UNIX utility programs with
+complementary functions (e.g. compress and uncompress ) look
+like two programs, but in fact are one program with two names
+in the file system. The two-name trick is accomplished by creating
+a file system "link" using the ```ln``` command.
+
+An example from my /usr/bin on MacOS 10.14.5 is:
+```bash
+   $ ls -li /usr/bin/git*
+3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/git
+3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/git-receive-pack
+...
+```
+
+Here ```git``` and ```git-receive-pack``` are the same file with
+different names. We can tell it's the same file since they have the
+same i-node number (the first column). An i-node is a feature of the
+UNIX file system and is super outside the scope of this article. Also
+smells like another article.
+
+Good and/or lazy programmers can use this feature of the UNIX
+filesystem to write less code but double the number of programs they
+deliver. First we write a program that changes it's behavior based on
+the value of ```argv[0]``` and then we make sure to create links
+(sometimes called hard-links) with the names that cause the behavior.
+
+Things are getting complex for sure, but it's managed.
+
+### The ```main``` Function
+
+The structure of the ```main.c``` file for ```meow```/```unmeow``` should be
+familiar to my [long-time readers][1]. In brief, the file has the
+following general outline:
+
+```C
+   /* main.c - MeowMeow, a stream encoder/decoder */
+   /* 00 system includes */
+   /* 01 project includes */
+   /* 02 defines */
+   /* 03 typedefs */
+   /* 04 globals (but don't)*/
+   /* 05 ancillary function prototypes if any */
+   
+   int main(int argc, char *argv[])
+   {
+       /* 06 variable declarations */
+	   /* 07 check argv[0] to see how the program was invoked */
+       /* 08 process the command line options from the user */
+	   /* 09 do the needful */
+   }
+   
+   /* 10 ancillary functions if any */
+```
+
+
+
+
+
+
+
 
 
 
@@ -144,10 +279,10 @@ directives. Header files should **not** have any functions in them.
 
 <!- XXX this could be a good outro (sentiment, if not wording) -->
 
-This article would have turned into a very boring book if I try to describe
-every line of every file, so some things I chose to gloss over. Leave me
-comments to let me know how bad my choices were and where my next article
-should take us.
+This article would have turned into a very boring book if I try to
+describe every line of every file, so some things I had to gloss over
+to avoid putting everyone to sleep. Leave me comments to let me know
+how bad my choices were and where my next article should take us.
 
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
 [2]: https://FIXME/link_to_posix_unix_def?
