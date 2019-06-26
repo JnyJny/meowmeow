@@ -5,6 +5,6 @@
 
 #include <stdio.h>
 
-int mm_decode(FILE *src, FILE *dst, int verbose);
+int mm_decode(FILE *src, FILE *dst);
 
 #endif	/* _MMDECODE_H */

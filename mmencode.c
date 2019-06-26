@@ -4,20 +4,17 @@
 #include <string.h>
 
 #include "mmencode.h"
+#include "table.h"
 
-#define NL '\n'
-
-int mm_encode(FILE *src, FILE *dst, int verbose)
+int mm_encode(FILE *src, FILE *dst)
 {
   char buf[BUFSIZ];
+  unsigned char *byte;
   unsigned char hi;
   unsigned char lo;
   int           i;
 
-  char * tbl[] = { "meow", "meoW", "meOw", "meOW",
-		   "mEow", "mEoW", "mEOw", "mEOW",
-		   "Meow", "MeoW", "MeOw", "MeOW",
-		   "MEow", "MEoW", "MEOw", "MEOW" };
+  char * tbl[] = ENCODER_INIT;
   
   if (!src || !dst) {
     errno = EINVAL;
@@ -32,8 +29,8 @@ int mm_encode(FILE *src, FILE *dst, int verbose)
     }
 
     for(i=0; i<strlen(buf); i++) {
-      lo = (buf[i] & 0x0f);
-      hi = (buf[i] & 0xf0) >> 4;
+      lo = (buf[i] & 0x000f);
+      hi = (buf[i] & 0x00f0) >> 4;
       fputs(tbl[hi], dst);
       fputs(tbl[lo], dst);
     }

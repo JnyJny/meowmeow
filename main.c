@@ -83,11 +83,11 @@ int main(int argc, char *argv[])
 
   switch(op) {
     case MM_OP_ENCODE:
-      retval = mm_encode(options.in_stream, options.out_stream, options.verbose);
+      retval = mm_encode(options.in_stream, options.out_stream);
       break;
       
     case MM_OP_DECODE:
-      retval = mm_decode(options.in_stream, options.out_stream, options.verbose);      
+      retval = mm_decode(options.in_stream, options.out_stream);
       break;
       
     default:
@@ -129,10 +129,10 @@ int pick_operation(char *argv0)
   name = basename(argv0);
 
   if (strncmp(name, CMD_MEOW, strlen(CMD_MEOW)) == 0)
-      return MM_OP_ENCODE;
+    return MM_OP_ENCODE;
 
-  if (strncmp(name, CMD_UNMEOW, strlen(CMD_UNMEOW)) == 0)
-      return MM_OP_ENCODE;  
+  if (strncmp(name, CMD_UNMEOW, strlen(CMD_UNMEOW)) == 0) 
+    return MM_OP_DECODE;  
   
   return MM_OP_INVALID;
 }
