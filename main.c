@@ -13,10 +13,11 @@
 #include "mmdecode.h"
 
 extern char *optarg;
+extern int   optopt;
 extern int   opterr;
 extern int   opterr;
 
-#define OPTARG "i:o:hvV"
+#define OPTARG "i:o:hV"
 
 #define MM_OP_INVALID 0
 #define MM_OP_ENCODE  1
@@ -29,13 +30,13 @@ int pick_operation(char *);
 int main(int argc, char *argv[])
 {
   options_t options = OPTIONS_INIT;
+  int retval        = -1;
+  int codec_op      = MM_OP_INVALID;
   int opt;
-  int retval;
-  int op;
 
   opterr = 0;
 
-  if ((op = pick_operation(argv[0])) == MM_OP_INVALID) {
+  if ((codec_op = pick_operation(argv[0])) == MM_OP_INVALID) {
     errno = EINVAL;
     perror("meow/unmeow argv[0] unrecognized!");
     exit(-1);
@@ -62,10 +63,6 @@ int main(int argc, char *argv[])
 	}
 	break;
 	
-      case 'v':
-	options.verbose ++;
-	break;
-
       case 'V':
 	printf("%s version %s\n",
 	       basename(argv[0]),
@@ -73,15 +70,19 @@ int main(int argc, char *argv[])
 	exit(EXIT_SUCCESS);
 	/* NOTREACHED */
 	break;
+
+      case 'v':
+	options.verbose ++;
+	break;
 	
       case '?':
       case 'h':
       default:
-	usage(basename(argv[0]), opt);
+	usage(basename(argv[0]), optopt);
 	break;
     }
 
-  switch(op) {
+  switch(codec_op) {
     case MM_OP_ENCODE:
       retval = mm_encode(options.in_stream, options.out_stream);
       break;
@@ -93,7 +94,7 @@ int main(int argc, char *argv[])
     default:
       retval = -1;
       errno = EINVAL;
-      /* XXX write something snarky here and abend */
+      fprintf(stderr, "Impossible state: %s codec=%d\n", argv[0], codec_op);
       break;
   }
 
@@ -111,7 +112,8 @@ int usage(char *argv0, int opt)
   
   fprintf(stderr, "usage: %s [-i input] [-o output] [-v]\n",
 	  basename(argv0));
-  fprintf(stderr, "\n\tunknown option %c\n", opt);
+  if (opt != '?')
+    fprintf(stderr, "unknown option: \"%c\"\n", opt);
   exit(EXIT_FAILURE);
   /* NOTREACHED */
 }
