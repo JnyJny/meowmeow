@@ -100,6 +100,7 @@ following commands:
    $ touch mmencode.h   # describes the encoding API
    $ touch mmdecode.c   # implements decoding a MeowMeow file
    $ touch mmdecode.h   # describes the decoding API
+   $ touch table.h      # defines encoding lookup table values
    $ touch README.md    # this awesome file
    $ touch .gitignore   # names in this file are ignored by git
    $ git add .
