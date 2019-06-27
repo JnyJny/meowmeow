@@ -35,8 +35,6 @@ int stupid_decode(FILE *src, FILE *dst);
 
 int mm_decode(FILE *src, FILE *dst)
 {
-
-  
   if (!src || !dst) {
     errno = EINVAL;
     return -1;
