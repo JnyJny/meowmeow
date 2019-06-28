@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	/* XXX handle "-" explicitly as stdin */
 	if (!(options.in_stream = fopen(optarg, "r"))) {
 	  perror("Error opening input stream");
-	  exit(EXIT_FAILURE);
+	  exit(-1);
 	  /* NOTREACHED */
 	}
 	break;
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	/* XXX handle "-" explicitly as stdout */
 	if (!(options.out_stream = fopen(optarg, "w"))) {
 	  perror("Error opening output stream");
-	  exit(EXIT_FAILURE);
+	  exit(-1);
 	  /* NOTREACHED */
 	}
 	break;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	printf("%s version %s\n",
 	       basename(argv[0]),
 	       MEOWMEOW_VERSION);
-	exit(EXIT_SUCCESS);
+	exit(0);
 	/* NOTREACHED */
 	break;
 
@@ -98,7 +98,12 @@ int main(int argc, char *argv[])
       break;
   }
 
-  return retval==0?EXIT_SUCCESS:EXIT_FAILURE;
+  if (retval < 0) {
+    perror("codec failed");
+  }
+  
+
+  return retval;
 }
 
 
@@ -107,14 +112,14 @@ int usage(char *argv0, int opt)
   if (!argv0) {
     errno = EINVAL;
     perror("main:usage called with NULL argv[0]");
-    exit(EXIT_FAILURE);
+    exit(-1);
   }
   
   fprintf(stderr, "usage: %s [-i input] [-o output] [-v]\n",
 	  basename(argv0));
   if (opt != '?')
     fprintf(stderr, "unknown option: \"%c\"\n", opt);
-  exit(EXIT_FAILURE);
+  exit(-1);
   /* NOTREACHED */
 }
 

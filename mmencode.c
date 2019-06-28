@@ -23,10 +23,8 @@ int mm_encode(FILE *src, FILE *dst)
 
   while (!feof(src)) {
     
-    if (!fgets(buf, sizeof(buf), src)) {
-      ferror(src);
-      return -1;
-    }
+    if (!fgets(buf, sizeof(buf), src))
+      break;
 
     for(i=0; i<strlen(buf); i++) {
       lo = (buf[i] & 0x000f);

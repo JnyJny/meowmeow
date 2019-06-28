@@ -43,8 +43,11 @@ sdist: clobber
 	$(CP) $(MANIFEST) $(SDIST_ROOT)
 	$(TAR) zcf $(SDIST_TARFILE) $(SDIST_ROOT)
 
+README.meow: $(ENCODER) README.md
+	./$(ENCODER) < README.md > $@
+
 clean:
-	@$(RM) -f $(OBJ) *~
+	@$(RM) -f $(OBJ) *~ README.meow
 
 clobber: clean
 	@$(RM) -f $(TARGETS) $(SDIST_TARFILE)

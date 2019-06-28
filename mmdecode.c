@@ -6,32 +6,42 @@
 
 #include "mmdecode.h"
 
-typedef union {
-  struct {
-#if __BYTE_ORDER != __BIG_ENDIAN
-    unsigned int f0:1;    
-    unsigned int f1:1;
-    unsigned int f2:1;
-    unsigned int f3:1;    
-    unsigned int f4:1;
-    unsigned int f5:1;
-    unsigned int f6:1;    
-    unsigned int f7:1;
+typedef struct {
+  unsigned int f7:1;    
+  unsigned int f6:1;
+  unsigned int f5:1;
+  unsigned int f4:1;    
+  unsigned int f3:1;
+  unsigned int f2:1;
+  unsigned int f1:1;    
+  unsigned int f0:1;
+} be_fields_t;
+
+typedef struct {
+  unsigned int f0:1;    
+  unsigned int f1:1;
+  unsigned int f2:1;
+  unsigned int f3:1;    
+  unsigned int f4:1;
+  unsigned int f5:1;
+  unsigned int f6:1;    
+  unsigned int f7:1;
+} le_fields_t;
+
+#if __BYTE_ORDER == __BIG_ENDIAN
+typedef be_fields_t fields_t;
 #else
-    unsigned int f7:1;    
-    unsigned int f6:1;
-    unsigned int f5:1;
-    unsigned int f4:1;    
-    unsigned int f3:1;
-    unsigned int f2:1;
-    unsigned int f1:1;    
-    unsigned int f0:1;
+typedef le_fields_t fields_t;
 #endif
-  } field;
+
+typedef union {
+  fields_t      field;
   unsigned char value;
 } decoded_byte_t;
 
+
 int stupid_decode(FILE *src, FILE *dst);
+
 
 int mm_decode(FILE *src, FILE *dst)
 {
@@ -43,6 +53,7 @@ int mm_decode(FILE *src, FILE *dst)
   return stupid_decode(src, dst);
 }
 
+
 int stupid_decode(FILE *src, FILE *dst)
 {
   char           buf[9];
@@ -51,10 +62,8 @@ int stupid_decode(FILE *src, FILE *dst)
   
   while (!feof(src)) {
     
-    if (!fgets(buf, sizeof(buf), src)) {
-      ferror(src);
-      return -1;
-    }
+    if (!fgets(buf, sizeof(buf), src))
+      break;
 
     byte.field.f0 = isupper(buf[0]);
     byte.field.f1 = isupper(buf[1]);

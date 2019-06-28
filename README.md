@@ -81,7 +81,7 @@ This is going to be awesome.
 
 ### Implementation, Finally
 
-The full source for this can be found on [GitHub][5] but I'm going to
+The full source for this can be found on [GitHub][0] but I'm going to
 talk through my thought process while writing it. The object here is
 to illustrate how to structure a C program composed of multiple files.
 
@@ -187,11 +187,11 @@ Using a Makefile is simple:
    Makefile  main.c  my_sweet_program
 ```
 
-The [Makefile][makefile] that will build our MeowMeow encoder/decoder is
-considerably more sophisticated than this example, but the basic
-structure is the same. Some targets create real files, some targets
-are 'phony' since they don't create a specific file but act as a sort
-of alias. I smell another article here about writing Makefiles. Before
+The [Makefile][makefile] that will build our MeowMeow encoder/decoder
+is considerably more sophisticated than this example, but the basic
+structure is the same. I break it down [Barney-style][makefile101] for you in
+this article.
+
 I forget, the GNU Make command has excellent [documentation][6].
 
 ### Form Follows Function
@@ -243,14 +243,14 @@ An example from ```/usr/bin``` on my laptop is:
 Here ```git``` and ```git-receive-pack``` are the same file with
 different names. We can tell it's the same file since they have the
 same i-node number (the first column). An i-node is a feature of the
-UNIX filesystem and is super outside the scope of this article. Also
-smells like another article.
+UNIX filesystem and is super outside the scope of this article, but
+not [this one][unix_fs].
 
 Good and/or lazy programmers can use this feature of the UNIX
 filesystem to write less code but double the number of programs they
 deliver. First we write a program that changes it's behavior based on
-the value of ```argv[0]``` and then we make sure to create links
-(sometimes called hard-links) with the names that cause the behavior.
+the value of ```argv[0]``` and then we make sure to create links with
+the names that cause the behavior.
 
 In our Makefile, the ```unmeow``` link is created using this recipe:
 
@@ -361,22 +361,23 @@ variables and functions in one file are not usable by functions or
 variables in another file. 
 
 Writing header files is complex and it is tough to manage in larger
-projects. Use guards.
+projects. Use guards. I have more thoughts about
+[C header files][c_headers] if you've got some more time to kill.
 
-### MeowMeow Encoding
+### MeowMeow Encoding, Finally
 
 The meat and potatoes of this program, encoding and decoding bytes
 into/out of "MeowMeow" strings is actually the easy part of this project.
+All of our activities up to now have been putting the scaffolding in
+place to support calling this function.
 
 ```C
     /* mmencode.c - MeowMeow, a stream encoder/decoder */
     ...
         while (!feof(src)) {
 	    
-          if (!fgets(buf, sizeof(buf), src)) {
-            ferror(src);
-            return -1;
-          }
+          if (!fgets(buf, sizeof(buf), src))
+            break;
 	      
           for(i=0; i<strlen(buf); i++) {
             lo = (buf[i] & 0x000f);
@@ -395,11 +396,11 @@ realizing that four bits can encode sixteen values. I use ```hi``` and
 ```lo``` as indices into a sixteen string lookup table, ```tbl```,
 that contains the **MeowMeow** strings that encode each nibble. Those
 strings are written to the destination ```FILE``` stream and we move
-on to the next byte in the buffer.
+on to the next byte in the buffer. 
 
 The table is initialized with a macro defined in [```table.h```][table_h]
 for no particular reason except to demonstrate including another project
-local header file and I like initialization macros.
+local header file and I like [initialization macros][init_macro].
 
 ### MeowMeow Decoding
 
@@ -422,16 +423,17 @@ strings and then reverse the encoding from strings to bytes.
 	
 Not what you were expecting?
 
-Here, I'm exposing ```stupid_decode()``` via the externally visible
-```mm_decode()``` function. When I say "externally" I mean outside this
-file. Since ```stupid_decode()``` isn't in the header file, it isn't
-available to be called in other files.
+Here, I'm exposing the function ```stupid_decode()``` via the
+externally visible ```mm_decode()``` function. When I say "externally"
+I mean outside this file. Since ```stupid_decode()``` isn't in the
+header file, it isn't available to be called in other files.
 
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
 problem. In my case, I've written a I/O intensive function that reads
 eight bytes at a time from the source buffer to decode one byte to
-write to the destination buffer.
+write to the destination buffer. A better implementation would work
+on a buffer bigger than eight bytes at a time.
 
 ```C
     /* mmdecode.c - MeowMeow, a stream decoder/decoder */
@@ -443,10 +445,8 @@ write to the destination buffer.
       int            i;
       
       while (!feof(src)) {
-        if (!fgets(buf, sizeof(buf), src)) {
-          ferror(src);
-          return -1;
-        }
+        if (!fgets(buf, sizeof(buf), src))
+          break;
         byte.field.f0 = isupper(buf[0]);
         byte.field.f1 = isupper(buf[1]);
         byte.field.f2 = isupper(buf[2]);
@@ -469,31 +469,42 @@ create a custom data structure called ```decoded_byte_t```.
     /* mmdecode.c - MeowMeow, a stream decoder/decoder */
     ...
 
-    typedef union {
-      struct {
-    #if __BYTE_ORDER != __BIG_ENDIAN
-        unsigned int f0:1;
-        unsigned int f1:1;
-        unsigned int f2:1;
-        unsigned int f3:1;
-        unsigned int f4:1;
-        unsigned int f5:1;
-        unsigned int f6:1;
-        unsigned int f7:1;
+    typedef struct {
+      unsigned int f7:1;
+      unsigned int f6:1;
+      unsigned int f5:1;
+      unsigned int f4:1;
+      unsigned int f3:1;
+      unsigned int f2:1;
+      unsigned int f1:1;
+      unsigned int f0:1;
+    } be_fields_t;
+    
+    typedef struct {
+      unsigned int f0:1;
+      unsigned int f1:1;
+      unsigned int f2:1;
+      unsigned int f3:1;
+      unsigned int f4:1;
+      unsigned int f5:1;
+      unsigned int f6:1;
+      unsigned int f7:1;
+    } le_fields_t;
+    
+    #if __BYTE_ORDER == __BIG_ENDIAN
+    typedef be_fields_t fields_t;
     #else
-        unsigned int f7:1;
-        unsigned int f6:1;
-        unsigned int f5:1;
-        unsigned int f4:1;
-        unsigned int f3:1;
-        unsigned int f2:1;
-        unsigned int f1:1;
-        unsigned int f0:1;
+    typedef le_fields_t fields_t;
     #endif
-      } field;
+    
+    typedef union {
+      fields_t      field;
       unsigned char value;
     } decoded_byte_t;
+
 ```
+
+<!-- This paragraph needs a re-write
 
 This data structure is a ```union``` of a ```char``` and a
 ```struct``` which has eight one bit fields. The ```char``` and the
@@ -502,6 +513,8 @@ This data structure is a ```union``` of a ```char``` and a
 of the fields are reversed depending on whether the current platform
 is [big-endian][7] or [little-endian][8], using values included from
 ```/usr/include/ctype.h```.
+
+-->
 
 This complex looking data structure makes it simple to access each bit
 in the byte by field name, regardless of endian-ness, and then access
@@ -512,10 +525,10 @@ debugging.
 
 Lastly, ```stupid_decode()``` is *stupid* because it only reads eight
 bytes at time from the source FILE stream. Normally, we try to
-minimize the number of reads to improve performance. I won't try to
-explain the cost of system calls right now, just remember reading or
-writing a bigger chunk less often is better than a lot of smaller chunks
-more frequently.
+minimize the number of reads and writes to improve performance. I
+explain the cost of system calls in more detail [here][system_calls],
+but for now just remember reading or writing a bigger chunk less often
+is better than a lot of smaller chunks more frequently.
 
 ### The Wrap Up
 
@@ -532,18 +545,21 @@ instead of ```bash``` scripts to automate all sorts of things.
 
 I know I've only touched the surface of what's going on in this simple
 program and I'm excited to learn what things were helpful to you and
-what things need better explanations. Drop me a line in the comments to
-let me know.
+which topics need better explanations. Share your thoughts in the
+comments to let me know.
 
+
+[0]: https://github.com/JnyJny/meowmeow.git
 
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
 [2]: https://FIXME/link_to_posix_unix_def?
 [3]: http://www.jabberwocky.com/software/moomooencode.html
 [4]: https://FIXME/link_to_nyan_cat_gif
-[5]: https://github.com/JnyJny/meowmeow.git
+
 [6]: https:///FIXME/make_documentation
 [7]: https:///FIXME/wikipedia/big-endian
 [8]: https:///FIXME/wikipedia/little-endian
+
 [main_c]: https:///FIXME/link/main.c
 [main_h]: https:///FIXME/link/main.h
 [mmencoder_h]: https:///FIXME/link/mmencoder.h
@@ -552,3 +568,10 @@ let me know.
 [mmdecoder_c]: https:///FIXME/link/mmdecoder.c
 [makefile]: https:///FIXME/link/Makefile
 
+[init_macro]: https:///FIXME/link/to/table.h/ENCODER_INIT
+
+[makefile101]: https://github.com/JnyJny/meowmeow/articles/00_Makefiles.md
+[c_headers]: https://github.com/JnyJny/meowmeow/articles/10-Headers.md
+[unix_fs]: https://github.com/JnyJny/meowmeow/articles/20-UNIX_Filesystem.md
+[system_calls]: https://github.com/JnyJny/meowmeow/articles/30-SystemCalls.md
+[namespaces]: https://github.com/JnyJny/meowmeow/articles/40-C-Namespaces.md
