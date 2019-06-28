@@ -7,32 +7,15 @@
 #include "mmdecode.h"
 
 typedef struct {
-  unsigned int f7:1;    
-  unsigned int f6:1;
-  unsigned int f5:1;
-  unsigned int f4:1;    
-  unsigned int f3:1;
-  unsigned int f2:1;
-  unsigned int f1:1;    
-  unsigned int f0:1;
-} be_fields_t;
-
-typedef struct {
-  unsigned int f0:1;    
-  unsigned int f1:1;
-  unsigned int f2:1;
-  unsigned int f3:1;    
-  unsigned int f4:1;
-  unsigned int f5:1;
-  unsigned int f6:1;    
-  unsigned int f7:1;
-} le_fields_t;
-
-#if __BYTE_ORDER == __BIG_ENDIAN
-typedef be_fields_t fields_t;
-#else
-typedef le_fields_t fields_t;
-#endif
+  unsigned char f7:1;    
+  unsigned char f6:1;
+  unsigned char f5:1;
+  unsigned char f4:1;    
+  unsigned char f3:1;
+  unsigned char f2:1;
+  unsigned char f1:1;    
+  unsigned char f0:1;
+} fields_t;
 
 typedef union {
   fields_t      field;
@@ -49,7 +32,7 @@ int mm_decode(FILE *src, FILE *dst)
     errno = EINVAL;
     return -1;
   }
-
+  
   return stupid_decode(src, dst);
 }
 
