@@ -12,15 +12,15 @@ something. Grab your favorite beverage, your favorite editor and
 compiler, crank up some tunes and let's write a mildly interesting C
 program together.
 
-### Philosophy of A Good UNIX C Program
+### Philosophy of A Good UNIX Program
 
 The first thing to know about this C program is that it's a [UNIX][2]
 command-line tool. This means that it runs on, or can be ported to,
 operating systems that provide a UNIX C run-time environment. When
 UNIX was first invented at Bell Labs, it was imbued from the beginning
-with a design philosophy: programs do one thing, do it well and act on
+with a [design philosophy][14]: programs do one thing, do it well and act on
 files.  While it makes sense to do one thing and do it well, the part
-about acting on files seems a little out of place. 
+about acting on files seems a little out of place.
 
 It turns out that the UNIX abstraction of a "file" is very powerful. A
 UNIX file is a stream of bytes that ends with an End Of File (EOF)
@@ -31,7 +31,7 @@ standard operations on files: open, read, write, seek, and close
 (there are others but those are the biggies). Standardizing access to
 files allows different programs to share a common abstraction and work
 together even when they were implemented by different people in
-possibly different languages.
+different programming languages.
 
 Having a shared file interface makes it possible to build programs
 that are **composable**. The output of one program can be the input of
@@ -63,12 +63,12 @@ for compressing files, some were for packaging files together and
 others had no purpose but to be excrutiatingly silly. An example of
 the last is the [MooMoo encoding scheme][3].
 
-For our example, I'll update this concept for the [2000s][4] and
-implement a MeowMeow encoding since the Internet loves cats. The basic
-idea here is to take files and encode each nibble (half of a byte)
-with the text "meow". A lower-case letter indicates a zero and
-upper-case indicates a one. Yes, it will balloon the size of a file
-since we are trading four bits for thirty two bits. Yes, it's
+To give our program a purpose, I'll update this concept for the
+[2000s][4] and implement a MeowMeow encoding since the Internet loves
+cats. The basic idea here is to take files and encode each nibble
+(half of a byte) with the text "meow". A lower-case letter indicates a
+zero and upper-case indicates a one. Yes, it will balloon the size of
+a file since we are trading four bits for thirty two bits. Yes, it's
 pointless. But imagine the surpise on someone's face when this
 happens:
 
@@ -140,8 +140,11 @@ But what about those ```.h``` files? I'll explain them in general terms
 later, but in brief those are called _header_ files and they can
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
+You can think of headers as a definition of the application programming
+interface (API) offered by the ```.c``` flavored file that is used
+by other ```.c``` files.
 
-### What The Heck is a Makefile?
+### But What The Heck is a Makefile?
 
 I know all you cool kids are using the "Ultra CodeShredder 3000"
 integrated development environment to write the next blockbuster app
@@ -172,10 +175,10 @@ Line 02 consists of the name of the file that the recipe creates
 and the files it depends on. In this case the target is ```my_sweet_program```
 and the dependency is ```main.c```.
 
-The final line, 03, is indented with an honest-to-Crom tab, not four
-spaces. This is the command that will be executed to create the
-target. In this case, we call ```cc``` the C compiler front-end to
-compile and link ```my_sweet_program```.
+The final line, 03, is indented with a tab and not four spaces. This is
+the command that will be executed to create the target. In this case,
+we call ```cc``` the C compiler front-end to [compile and link][article-compiling]
+```my_sweet_program```.
 
 Using a Makefile is simple:
 
@@ -186,21 +189,22 @@ Using a Makefile is simple:
    Makefile  main.c  my_sweet_program
 ```
 
-The [Makefile][11] that will build our MeowMeow encoder/decoder
-is considerably more sophisticated than this example, but the basic
+The [Makefile][11] that will build our MeowMeow encoder/decoder is
+considerably more sophisticated than this example, but the basic
 structure is the same. I'll break it down [Barney-style][article-makefile]
-for you in this article.
+for you, and you'll be writing cool Makefiles in no time.
 
 ### Form Follows Function
 
-The idea here is to write a program that reads a file, transforms
-it and then writes it to another file. The following fabricated
-command-line interaction is how I imagine using the program:
+My idea here is to write a program that reads a file, transforms it
+and then writes the transformed data to another file. The following
+fabricated command-line interaction is how I imagine using the
+program:
 
 ```bash
-	$ meow < clear_text > meow_text
-	$ unmeow < meow_text > declawed_text
-	$ diff clear_text declawed_text
+	$ meow < clear.txt > clear.meow
+	$ unmeow < clear.meow > meow.tx
+	$ diff clear.txt meow.tx
 	$
 ```
 
@@ -320,7 +324,7 @@ the contents of the named file to be "included" at this point in the file.
 If the programmer uses double-quotes around the name of the header file,
 the compiler will look for that file in the current directory. If the file
 is enclosed in &lt;&gt;, it will look for the file in a set of predefined
-directories. 
+directories.
 
 The file [```main.h```][7] contains definitions and typedefs that are used
 in [```main.c```][8]. I like to collect these things here in case I want
@@ -364,9 +368,11 @@ projects. Use guards. I have more thoughts about
 ### MeowMeow Encoding, Finally
 
 The meat and potatoes of this program, encoding and decoding bytes
-into/out of "MeowMeow" strings is actually the easy part of this project.
+into/out of "MeowMeow" strings, is actually the easy part of this project.
 All of our activities up to now have been putting the scaffolding in
-place to support calling this function.
+place to support calling this function; parsing the command-line,
+determining which operation to use and opening the files that we'll
+operate upon. Here is the encoding loop:
 
 ```C
     /* mmencode.c - MeowMeow, a stream encoder/decoder */
@@ -386,14 +392,15 @@ place to support calling this function.
 ```
 
 In plain English, this loop reads in a chunk of the file while there
-are chunks left to read (```feof()``` and ```fgets()```). Then it splits
-each byte in the chunk into ```hi``` and ```lo``` nibbles. Remember, a
-nibble is half of a byte, or four bits. The real magic here is
-realizing that four bits can encode sixteen values. I use ```hi``` 
-and ```lo``` as indices into a sixteen string lookup table, ```tbl```,
-that contains the **MeowMeow** strings that encode each nibble. Those
-strings are written to the destination ```FILE``` stream and then we move
-on to the next byte in the buffer. 
+are chunks left to read (```feof(3)``` and ```fgets(3)```). Then it
+splits each byte in the chunk into ```hi``` and ```lo```
+nibbles. Remember, a nibble is half of a byte, or four bits. The real
+magic here is realizing that four bits can encode sixteen values. I
+use ```hi``` and ```lo``` as indices into a sixteen string lookup
+table, ```tbl```, that contains the **MeowMeow** strings that encode
+each nibble. Those strings are written to the destination ```FILE```
+stream using ```fputs(3)``` and then we move on to the next byte in
+the buffer.
 
 The table is initialized with a macro defined in [```table.h```][12]
 for no particular reason except to demonstrate including another project
@@ -428,9 +435,11 @@ header file, it isn't available to be called in other files.
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
 problem. In my case, I've written a I/O intensive function that reads
-eight bytes at a time from the source buffer to decode one byte to
-write to the destination buffer. A better implementation would work
-on a buffer bigger than eight bytes at a time.
+eight bytes at a time from the source stream to decode one byte to
+write to the destination stream. A better implementation would work on
+a buffer bigger than eight bytes at a time. A **much** better
+implementation would also buffer the output bytes to reduce the number
+of single byte writes to the destination stream.
 
 ```C
     /* mmdecode.c - MeowMeow, a stream decoder/decoder */
@@ -467,32 +476,15 @@ elected to create a custom data structure called ```decoded_byte_t```.
     ...
 
     typedef struct {
-      unsigned int f7:1;
-      unsigned int f6:1;
-      unsigned int f5:1;
-      unsigned int f4:1;
-      unsigned int f3:1;
-      unsigned int f2:1;
-      unsigned int f1:1;
-      unsigned int f0:1;
-    } be_fields_t;
-    
-    typedef struct {
-      unsigned int f0:1;
-      unsigned int f1:1;
-      unsigned int f2:1;
-      unsigned int f3:1;
-      unsigned int f4:1;
-      unsigned int f5:1;
-      unsigned int f6:1;
-      unsigned int f7:1;
-    } le_fields_t;
-    
-    #if __BYTE_ORDER == __BIG_ENDIAN
-    typedef be_fields_t fields_t;
-    #else
-    typedef le_fields_t fields_t;
-    #endif
+      unsigned char f7:1;
+      unsigned char f6:1;
+      unsigned char f5:1;
+      unsigned char f4:1;
+      unsigned char f3:1;
+      unsigned char f2:1;
+      unsigned char f1:1;
+      unsigned char f0:1;
+    } fields_t;
     
     typedef union {
       fields_t      field;
@@ -501,55 +493,60 @@ elected to create a custom data structure called ```decoded_byte_t```.
 
 ```
 
-<!-- This paragraph needs a re-write
+It's a little complex when viewed all at once, but hang tough.  
+The ```decoded_byte_t``` is defined as a ```union``` of a ```fields_t```
+and an ```unsigned char```.  The named members of a union can be
+thought of as aliases for the same region of memory. In this
+case, ```value``` and ```field``` refer to the same eight-bit region of
+memory. Setting ```field.f0``` to 1 would also set the least
+significant bit in ```value```.
 
-This data structure is a ```union``` of a ```char``` and a
-```struct``` which has eight one bit fields. The ```char``` and the
-```struct``` are the same size and the union makes **field** and
-**value** "aliases" for the same byte-sized chunk of memory. The names
-of the fields are reversed depending on whether the current platform
-is [big-endian][5] or [little-endian][6], using values included from
-```/usr/include/ctype.h```.
+While ```unsigned char``` shouldn't be a mystery, the ```typedef```
+for ```fields_t``` might look a little unfamiliar. Modern C compilers
+allow programmers to specify 'bit fields' in a ```struct```, the field
+type needs to be an unsigned integral type and the member identifer is
+followed by a colon and an integer that specifies the length of the
+bit field.
 
--->
-
-This complex looking data structure makes it simple to access each bit
-in the byte by field name, regardless of endian-ness, and then access
-the assembled value via the ```value``` field of the union. We depend
-on the compiler to generate the correct bit-shifting instructions to
-access the fields, which can save you a lot heartburn when you are
-debugging.
+This data structure makes it simple to access each bit in the byte by
+field name and then access the assembled value via the ```value```
+field of the union. We depend on the compiler to generate the correct
+bit-shifting instructions to access the fields, which can save you a
+lot heartburn when you are debugging.
 
 Lastly, ```stupid_decode()``` is *stupid* because it only reads eight
-bytes at time from the source FILE stream. Normally, we try to
+bytes at time from the source ```FILE``` stream. Normally, we try to
 minimize the number of reads and writes to improve performance. I
 explain the cost of system calls in more detail [here][system_calls],
 but for now just remember reading or writing a bigger chunk less often
-is better than a lot of smaller chunks more frequently.
+is much better than reading/writing a lot of smaller chunks more
+frequently.
 
 ### The Wrap Up
 
 Writing a multi-file program in C requires a little more planning on
 behalf of the programmer than just a single ```main.c```. But just a
-little effort up front can save you a lot of refactoring down the
-road as you add functionality.
+little effort up front can save a lot of time and headache when you
+refactor as you add functionality.
 
-I like to have a lot of files with a few short functions in them. I
-like to expose a small subset of the functions in those files via
-header files. I like to keep my constants in header files, both
+To recap, I like to have a lot of files with a few short functions in
+them. I like to expose a small subset of the functions in those files
+via header files. I like to keep my constants in header files, both
 numeric and string constants. I **love** Makefiles and use them
 instead of ```bash``` scripts to automate all sorts of things.
+I like my```main()``` function to handle command-line argument parsing
+and act as a scaffold for the primary functionality of the program.
 
 I know I've only touched the surface of what's going on in this simple
 program and I'm excited to learn what things were helpful to you and
 which topics need better explanations. Share your thoughts in the
 comments to let me know.
 
+<!-- fin -->
 
 [0]: https://github.com/JnyJny/meowmeow.git
-
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
-[2]: https://FIXME/wiipedia/UNIX
+[2]: https://FIXME/wikipedia/UNIX
 [3]: http://www.jabberwocky.com/software/moomooencode.html
 [4]: https://FIXME/link_to_nyan_cat_gif
 [5]: https:///FIXME/wikipedia/big-endian
@@ -563,9 +560,15 @@ comments to let me know.
 [11]: https:///FIXME/link/Makefile
 [12]: https:///FIXME/link/table.h
 [13]: https:///FIXME/link/to/table.h/ENCODER_INIT
+[14]: http://harmful.cat-v.org/cat-v/
+
+<!-- Links to articles referenced by this article that remain to be written -->
 
 [article-makefile]: https://github.com/JnyJny/meowmeow/articles/10_Makefiles.md
 [article-headers]: https://github.com/JnyJny/meowmeow/articles/20-Headers.md
 [article-unix-fs]: https://github.com/JnyJny/meowmeow/articles/30-UNIX_Filesystem.md
 [article-syscalls]: https://github.com/JnyJny/meowmeow/articles/40-SystemCalls.md
 [article-namespaces]: https://github.com/JnyJny/meowmeow/articles/50-Namespaces.md
+[article-files]: https://github.com/JnyJny/meowmeow/articles/60-Working-With-Files.md
+[article-compiling]: https://github.com/JnyJny/meowmeow/articles/70-Compiling.md
+[article-shared-object]: https://github.com/JnyJny/meowmeow/articles/80-Shared-Object.md
