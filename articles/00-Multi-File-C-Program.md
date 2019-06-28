@@ -101,7 +101,6 @@ following commands:
    $ touch mmdecode.c   # implements decoding a MeowMeow file
    $ touch mmdecode.h   # describes the decoding API
    $ touch table.h      # defines encoding lookup table values
-   $ touch README.md    # this awesome file
    $ touch .gitignore   # names in this file are ignored by git
    $ git add .
    $ git commit -m "initial commit of empty files"
@@ -187,12 +186,10 @@ Using a Makefile is simple:
    Makefile  main.c  my_sweet_program
 ```
 
-The [Makefile][makefile] that will build our MeowMeow encoder/decoder
+The [Makefile][11] that will build our MeowMeow encoder/decoder
 is considerably more sophisticated than this example, but the basic
-structure is the same. I break it down [Barney-style][makefile101] for you in
-this article.
-
-I forget, the GNU Make command has excellent [documentation][6].
+structure is the same. I'll break it down [Barney-style][article-makefile]
+for you in this article.
 
 ### Form Follows Function
 
@@ -244,7 +241,7 @@ Here ```git``` and ```git-receive-pack``` are the same file with
 different names. We can tell it's the same file since they have the
 same i-node number (the first column). An i-node is a feature of the
 UNIX filesystem and is super outside the scope of this article, but
-not [this one][unix_fs].
+not [this one][article-unix-fs].
 
 Good and/or lazy programmers can use this feature of the UNIX
 filesystem to write less code but double the number of programs they
@@ -325,11 +322,11 @@ the compiler will look for that file in the current directory. If the file
 is enclosed in &lt;&gt;, it will look for the file in a set of predefined
 directories. 
 
-The file [```main.h```][main_h] contains definitions and typedefs that are used
-in [```main.c```][main_c]. I like to collect these things here in case I want
+The file [```main.h```][7] contains definitions and typedefs that are used
+in [```main.c```][8]. I like to collect these things here in case I want
 to use those definitions elsewhere in my program.
 
-The files [```mmencode.h```][mmencode_h] and [```mmdecode.h```][mmdecode_h]
+The files [```mmencode.h```][9] and [```mmdecode.h```][11]
 are nearly identical so I'll break down ```mmencode.h```.
 
 ```C
@@ -362,7 +359,7 @@ variables in another file.
 
 Writing header files is complex and it is tough to manage in larger
 projects. Use guards. I have more thoughts about
-[C header files][c_headers] if you've got some more time to kill.
+[C header files][article-headers] if you've got some more time to kill.
 
 ### MeowMeow Encoding, Finally
 
@@ -392,15 +389,15 @@ In plain English, this loop reads in a chunk of the file while there
 are chunks left to read (```feof()``` and ```fgets()```). Then it splits
 each byte in the chunk into ```hi``` and ```lo``` nibbles. Remember, a
 nibble is half of a byte, or four bits. The real magic here is
-realizing that four bits can encode sixteen values. I use ```hi``` and
-```lo``` as indices into a sixteen string lookup table, ```tbl```,
+realizing that four bits can encode sixteen values. I use ```hi``` 
+and ```lo``` as indices into a sixteen string lookup table, ```tbl```,
 that contains the **MeowMeow** strings that encode each nibble. Those
-strings are written to the destination ```FILE``` stream and we move
+strings are written to the destination ```FILE``` stream and then we move
 on to the next byte in the buffer. 
 
-The table is initialized with a macro defined in [```table.h```][table_h]
+The table is initialized with a macro defined in [```table.h```][12]
 for no particular reason except to demonstrate including another project
-local header file and I like [initialization macros][init_macro].
+local header file and I like [initialization macros][13].
 
 ### MeowMeow Decoding
 
@@ -462,8 +459,8 @@ on a buffer bigger than eight bytes at a time.
     }
 ```
 
-Instead of using bit-shifting like in the encoder, I elected to
-create a custom data structure called ```decoded_byte_t```.
+Instead of using the bit-shifting technique I used in the encoder, I
+elected to create a custom data structure called ```decoded_byte_t```.
 
 ```C
     /* mmdecode.c - MeowMeow, a stream decoder/decoder */
@@ -511,7 +508,7 @@ This data structure is a ```union``` of a ```char``` and a
 ```struct``` are the same size and the union makes **field** and
 **value** "aliases" for the same byte-sized chunk of memory. The names
 of the fields are reversed depending on whether the current platform
-is [big-endian][7] or [little-endian][8], using values included from
+is [big-endian][5] or [little-endian][6], using values included from
 ```/usr/include/ctype.h```.
 
 -->
@@ -552,26 +549,23 @@ comments to let me know.
 [0]: https://github.com/JnyJny/meowmeow.git
 
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
-[2]: https://FIXME/link_to_posix_unix_def?
+[2]: https://FIXME/wiipedia/UNIX
 [3]: http://www.jabberwocky.com/software/moomooencode.html
 [4]: https://FIXME/link_to_nyan_cat_gif
+[5]: https:///FIXME/wikipedia/big-endian
+[6]: https:///FIXME/wikipedia/little-endian
+[7]: https:///FIXME/link/main.h
+[8]: https:///FIXME/link/main.c
+[9]: https:///FIXME/link/mmencode.h
+[10]: https:///FIXME/link/mmencode.c
+[11]: https:///FIXME/link/mmdecode.h
+[10]: https:///FIXME/link/mmdecoder.c
+[11]: https:///FIXME/link/Makefile
+[12]: https:///FIXME/link/table.h
+[13]: https:///FIXME/link/to/table.h/ENCODER_INIT
 
-[6]: https:///FIXME/make_documentation
-[7]: https:///FIXME/wikipedia/big-endian
-[8]: https:///FIXME/wikipedia/little-endian
-
-[main_c]: https:///FIXME/link/main.c
-[main_h]: https:///FIXME/link/main.h
-[mmencoder_h]: https:///FIXME/link/mmencoder.h
-[mmencoder_c]: https:///FIXME/link/mmencoder.c
-[mmdecoder_h]: https:///FIXME/link/mmdecoder.h
-[mmdecoder_c]: https:///FIXME/link/mmdecoder.c
-[makefile]: https:///FIXME/link/Makefile
-
-[init_macro]: https:///FIXME/link/to/table.h/ENCODER_INIT
-
-[makefile101]: https://github.com/JnyJny/meowmeow/articles/00_Makefiles.md
-[c_headers]: https://github.com/JnyJny/meowmeow/articles/10-Headers.md
-[unix_fs]: https://github.com/JnyJny/meowmeow/articles/20-UNIX_Filesystem.md
-[system_calls]: https://github.com/JnyJny/meowmeow/articles/30-SystemCalls.md
-[namespaces]: https://github.com/JnyJny/meowmeow/articles/40-C-Namespaces.md
+[article-makefile]: https://github.com/JnyJny/meowmeow/articles/10_Makefiles.md
+[article-headers]: https://github.com/JnyJny/meowmeow/articles/20-Headers.md
+[article-unix-fs]: https://github.com/JnyJny/meowmeow/articles/30-UNIX_Filesystem.md
+[article-syscalls]: https://github.com/JnyJny/meowmeow/articles/40-SystemCalls.md
+[article-namespaces]: https://github.com/JnyJny/meowmeow/articles/50-Namespaces.md
