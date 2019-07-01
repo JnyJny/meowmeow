@@ -44,9 +44,9 @@ bytes:
    unsigned char camel = 0xA5;
 ```
 
-- The value in ```zeros``` decodes to "meowmeow".
-- The value in ```ones``` decodes to "MEOWMEOW".
-- The value in ```camel``` decodes to "MeOwmEoW.
+- The value in ```zeros``` encodes to "meowmeow".
+- The value in ```ones``` encodes to "MEOWMEOW".
+- The value in ```camel``` encodes to "MeOwmEoW.
    
 
 
