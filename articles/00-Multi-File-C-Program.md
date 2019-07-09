@@ -341,7 +341,7 @@ are nearly identical so I'll break down ```mmencode.h```.
     
     #include <stdio.h>
     
-    int mm_encode(FILE *src, FILE *dst, int verbose);
+    int mm_encode(FILE *src, FILE *dst);
     
     #endif	/* _MMENCODE_H */
 ```
