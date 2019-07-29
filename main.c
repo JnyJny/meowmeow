@@ -70,10 +70,6 @@ int main(int argc, char *argv[])
 	exit(0);
 	/* NOTREACHED */
 	break;
-
-      case 'v':
-	options.verbose ++;
-	break;
 	
       case '?':
       case 'h':
@@ -115,7 +111,7 @@ int usage(char *argv0, int opt)
     exit(-1);
   }
   
-  fprintf(stderr, "usage: %s [-i input] [-o output] [-v]\n",
+  fprintf(stderr, "usage: %s [-i input] [-o output] [-V]\n",
 	  basename(argv0));
   if (opt != '?')
     fprintf(stderr, "unknown option: \"%c\"\n", opt);
