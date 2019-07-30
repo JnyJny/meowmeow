@@ -9,7 +9,6 @@
 int mm_encode(FILE *src, FILE *dst)
 {
   char buf[BUFSIZ];
-  unsigned char *byte;
   unsigned char hi;
   unsigned char lo;
   int           i;
