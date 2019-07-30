@@ -48,14 +48,14 @@ int stupid_decode(FILE *src, FILE *dst)
     if (!fgets(buf, sizeof(buf), src))
       break;
 
-    byte.field.f0 = isupper(buf[0]);
-    byte.field.f1 = isupper(buf[1]);
-    byte.field.f2 = isupper(buf[2]);
-    byte.field.f3 = isupper(buf[3]);
-    byte.field.f4 = isupper(buf[4]);
-    byte.field.f5 = isupper(buf[5]);
-    byte.field.f6 = isupper(buf[6]);
-    byte.field.f7 = isupper(buf[7]);    
+    byte.field.f0 = isupper(buf[0])==0?0:1;
+    byte.field.f1 = isupper(buf[1])==0?0:1;
+    byte.field.f2 = isupper(buf[2])==0?0:1;
+    byte.field.f3 = isupper(buf[3])==0?0:1;
+    byte.field.f4 = isupper(buf[4])==0?0:1;
+    byte.field.f5 = isupper(buf[5])==0?0:1;
+    byte.field.f6 = isupper(buf[6])==0?0:1;
+    byte.field.f7 = isupper(buf[7])==0?0:1;
     
     fputc(byte.value, dst);
   }
