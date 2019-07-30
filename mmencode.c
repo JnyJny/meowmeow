@@ -6,6 +6,10 @@
 #include "mmencode.h"
 #include "table.h"
 
+#define LO_MASK 0x000f
+#define HI_MASK 0x00f0
+#define BITS_IN_NIBBLE 4
+
 int mm_encode(FILE *src, FILE *dst)
 {
   char buf[BUFSIZ];
@@ -26,8 +30,8 @@ int mm_encode(FILE *src, FILE *dst)
       break;
 
     for(i=0; i<strlen(buf); i++) {
-      lo = (buf[i] & 0x000f);
-      hi = (buf[i] & 0x00f0) >> 4;
+      lo = (buf[i] & LO_MASK);
+      hi = (buf[i] & HI_MASK) >> BITS_IN_NIBBLE;
       fputs(tbl[hi], dst);
       fputs(tbl[lo], dst);
     }
