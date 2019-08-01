@@ -1,4 +1,4 @@
-/* mmdecode.h - MeowMeow, a stream decoder/decoder */
+/* mmdecode.h - MeowMeow, a stream encoder/decoder */
 
 #ifndef _MMDECODE_H
 #define _MMDECODE_H
