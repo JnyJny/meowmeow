@@ -1,4 +1,4 @@
-/* mmdecode.c - MeowMeow, a stream decoder/decoder */
+/* mmdecode.c - MeowMeow, a stream encoder/decoder */
 
 #include <errno.h>
 #include <string.h>
