@@ -517,7 +517,7 @@ lot heartburn when you are debugging.
 Lastly, ```stupid_decode()``` is *stupid* because it only reads eight
 bytes at time from the source ```FILE``` stream. Normally, we try to
 minimize the number of reads and writes to improve performance. I
-explain the cost of system calls in more detail [here][system_calls],
+explain the cost of system calls in more detail [here][article-syscalls],
 but for now just remember reading or writing a bigger chunk less often
 is much better than reading/writing a lot of smaller chunks more
 frequently.
