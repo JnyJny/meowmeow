@@ -346,7 +346,7 @@ are nearly identical so I'll break down ```mmencode.h```.
     #endif	/* _MMENCODE_H */
 ```
 
-The **```#ifdef, #define, #endif```** construction is collectively
+The **```#ifndef, #define, #endif```** construction is collectively
 known as a "guard". This keeps the C compiler from including this file
 more than once per file. The compiler will complain if it finds
 multiple definitions/prototypes/declarations so the guard is a **must
