@@ -357,7 +357,7 @@ directive and a function prototype declaration. I include ```stdio.h```
 here to bring in the definition of ```FILE``` which is used in
 the function prototype. The function prototype can be included
 by other C files to establish that function in the file's namespace.
-You can think of each file a seperate **namespace** which means
+You can think of each file as a seperate **namespace** which means
 variables and functions in one file are not usable by functions or
 variables in another file. 
 
