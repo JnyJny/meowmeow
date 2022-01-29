@@ -7,7 +7,7 @@ boxes".
 
 In this article I'll name some things and manage some complexity while
 writing a small C program that is loosely based on the program
-structure I [discussed earlier][1], but different. This one will do
+structure I [discussed earlier][1], but different. This one will _do_
 something. Grab your favorite beverage, your favorite editor and
 compiler, crank up some tunes and let's write a mildly interesting C
 program together.
@@ -37,19 +37,22 @@ Having a shared file interface makes it possible to build programs
 that are **composable**. The output of one program can be the input of
 another program. The UNIX family of operating systems provides
 three files by default whenever a program is executed:
-standard in (```stdin```), standard out (```stdout```) and standard
-error (```stderr```). Two of these files are opened in write-only
-mode; ```stdout``` and ```stderr```, while ```stdin``` is opened
-read-only. We see this in action whenever we use file redirection
-in a command shell like ```bash```:
 
-```bash
-   $ ls | grep foo | sed -e 's/bar/baz/g' > ack
+- standard in `stdin`
+- standard out `stdout`
+- standard error `stdout`
+
+Two of these files are opened in write-only mode; `stdout` and `stderr`,
+while `stdin` is opened read-only. We see this in action whenever we use
+file redirection in a command shell like `bash`:
+
+```console
+$ ls | grep foo | sed -e 's/bar/baz/g' > ack
 ```
 
-This construction can be described briefly as; the output of ```ls```
-is written to stdout which is redirected to the stdin of ```grep```
-whose stdout is redirected to ```sed``` whose stdout is redirected to
+This construction can be described briefly as; the output of `ls`
+is written to stdout which is redirected to the stdin of `grep`
+whose stdout is redirected to `sed` whose stdout is redirected to
 write to a file called 'ack' in the current directory.
 
 We want our program to play well in this ecosystem of equally flexible
@@ -57,9 +60,9 @@ and awesome programs, so lets write a program that reads and writes files.
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
-When I was a dewy-eyed kid studying computer science in the &lt;mumbles&gt;'s,
-there were an actual plethora of encoding schemes. Some of them were
-for compressing files, some were for packaging files together and
+When I was a dewy-eyed kid studying computer science in the late 80s,
+and early 90s, there were an actual plethora of encoding schemes. Some of
+them were for compressing files, some were for packaging files together and
 others had no purpose but to be excrutiatingly silly. An example of
 the last is the [MooMoo encoding scheme][3].
 
@@ -72,12 +75,12 @@ a file since we are trading four bits for thirty two bits. Yes, it's
 pointless. But imagine the surpise on someone's face when this
 happens:
 
-```
-   $ cat /home/your_sibling/.super_secret_journal_of_my_innermost_thoughts
-   MeOWmeOWmeowMEoW...
+```console
+$ cat /home/your_sibling/.super_secret_journal_of_my_innermost_thoughts
+MeOWmeOWmeowMEoW...
 ```
 
-This is going to be awesome.
+This is going to be _awesome_.
 
 ### Implementation, Finally
 
@@ -89,30 +92,30 @@ Having already established that I want to write a program that encodes
 and decodes files in MeowMeow format, I fired up a shell and issued the
 following commands:
 
-```bash
-   $ mkdir meowmeow
-   $ cd meowmeow
-   $ git init
-   $ touch Makefile     # recipes for compiling the program
-   $ touch main.c       # handles command-line options
-   $ touch main.h       # "global" constants and definitions
-   $ touch mmencode.c   # implements encoding a MeowMeow file
-   $ touch mmencode.h   # describes the encoding API
-   $ touch mmdecode.c   # implements decoding a MeowMeow file
-   $ touch mmdecode.h   # describes the decoding API
-   $ touch table.h      # defines encoding lookup table values
-   $ touch .gitignore   # names in this file are ignored by git
-   $ git add .
-   $ git commit -m "initial commit of empty files"
+```console
+$ mkdir meowmeow
+$ cd meowmeow
+$ git init
+$ touch Makefile     # recipes for compiling the program
+$ touch main.c       # handles command-line options
+$ touch main.h       # "global" constants and definitions
+$ touch mmencode.c   # implements encoding a MeowMeow file
+$ touch mmencode.h   # describes the encoding API
+$ touch mmdecode.c   # implements decoding a MeowMeow file
+$ touch mmdecode.h   # describes the decoding API
+$ touch table.h      # defines encoding lookup table values
+$ touch .gitignore   # names in this file are ignored by git
+$ git add .
+$ git commit -m "initial commit of empty files"
 ```
 
 In short, I created a directory full of empty files and committed them to git. 
 
 Even though the files are empty, you can infer the purpose of each
-from it's name. Just in case you can't, I annotated each ```touch```
+from it's name. Just in case you can't, I annotated each `touch`
 with a brief description.
 
-Normally a program starts as a single ```main.c``` file that is
+Normally a program starts as a single `main.c` file that is
 simple, with only two or three functions that solve the problem. And
 then the programmer rashly shows that program to a friend or her boss
 and suddenly the number of functions in the file balloons to support
@@ -120,7 +123,7 @@ all the new "features" and "requirements" that pop up. First rule of
 "Program Club" is don't talk about "Program Club".  The second rule is
 minimize the number of functions in one file.
 
-To be honest, the C compiler does not care one little bit if every
+To be honest, the C compiler does not care if every
 function in your program is in one file. But we don't write programs
 for computers or compilers, we write them for other people (who are
 sometimes us). I know that is probably a surprise, but it's true. A
@@ -131,12 +134,12 @@ have to modify the program and they will curse your name if you have
 all 2049 functions in one file.
 
 So we good and true programmers break functions out, grouping like
-functions into seperate files. Here I've got files **```main.c```**,
-**```mmencode.c```**, and **```mmdecode.c```**. For small programs
+functions into seperate files. Here I've got files **`main.c`**,
+**`mmencode.c`**, and **`mmdecode.c`**. For small programs
 like this, it may seem like overkill. But small programs rarely stay
 small, so planning for expansion is a "Good Idea".
 
-But what about those ```.h``` files? I'll explain them in general terms
+But what about those `.h` files? I'll explain them in general terms
 later, but in brief those are called _header_ files and they can
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
@@ -146,51 +149,51 @@ by other ```.c``` files.
 
 ### But What The Heck is a Makefile?
 
-I know all you cool kids are using the "Ultra CodeShredder 3000"
+I know all you cool kids are using the **"Ultra CodeShredder 3000™"**
 integrated development environment to write the next blockbuster app
 and building your project consists of mashing on
 "Ctrl-Meta-Shift-Alt-Super-B". But back in my day (and also today),
 lots of useful work got done by C programs built with Makefiles. A
 Makefile is a text file that contains recipes for working with files
 and programmers use it to automate building their program binaries
-from source (and other stuff too!).
+from source (and other stuff too!) using the `make` utility.
 
 For instance, this little gem:
 
 ```Makefile
-   00 # Makefile
-   01 TARGET= my_sweet_program
-   02 $(TARGET): main.c
-   03    cc -o my_sweet_program main.c
+00 # Makefile
+01 TARGET= my_sweet_program
+02 $(TARGET): main.c
+03 	cc -o my_sweet_program main.c
 ```
 
 Text after an octothorpe/pound/hash is a comment, like line 00.
 
 Line 01 is a variable assignment where the variable TARGET takes on
-the string value ```my_sweet_program```. By convention, ok my
-preference, all Makefile variables are capitalized and use underscores
+the string value "my_sweet_program". By convention, ok my
+_preference_, all Makefile variables are capitalized and use underscores
 to seperate words.
 
 Line 02 consists of the name of the file that the recipe creates
-and the files it depends on. In this case the target is ```my_sweet_program```
-and the dependency is ```main.c```.
+and the files it depends on. In this case the target is `my_sweet_program`
+and the dependency is `main.c`.
 
 The final line, 03, is indented with a tab and not four spaces. This is
 the command that will be executed to create the target. In this case,
-we call ```cc``` the C compiler front-end to [compile and link][article-compiling]
-```my_sweet_program```.
+we call `cc` the C compiler front-end to [compile and link][article-compiling]
+`my_sweet_program`.
 
 Using a Makefile is simple:
 
-```bash
-   $ make
-   cc -o my_sweet_program main.c
-   $ ls 
-   Makefile  main.c  my_sweet_program
+```console
+$ make
+cc -o my_sweet_program main.c
+$ ls 
+Makefile  main.c  my_sweet_program
 ```
 
 The [Makefile][11] that will build our MeowMeow encoder/decoder is
-considerably more sophisticated than this example, but the basic
+only a little more sophisticated than this example, but the basic
 structure is the same. I'll break it down [Barney-style][article-makefile]
 for you, and you'll be writing cool Makefiles in no time.
 
@@ -201,11 +204,11 @@ and then writes the transformed data to another file. The following
 fabricated command-line interaction is how I imagine using the
 program:
 
-```bash
-	$ meow < clear.txt > clear.meow
-	$ unmeow < clear.meow > meow.tx
-	$ diff clear.txt meow.tx
-	$
+```console
+$ meow < clear.txt > clear.meow
+$ unmeow < clear.meow > meow.tx
+$ diff clear.txt meow.tx
+$
 ```
 
 We need to write code to handle command-line parsing and managing the
@@ -213,10 +216,10 @@ input and output streams. We need a function to encode a stream and
 write it to another stream. And finally we need a function to decode a
 stream and write it to another stream. Wait a second, I've only been
 talking about writing one program but in the example above I invoke
-two commands; ```meow``` and ```unmeow```? I know you are probably
+two commands; `meow` and `unmeow`? I know you are probably
 thinking that this is getting complex as heck.
 
-### Minor Side Track - ```argv[0]``` and the ```ln``` command
+### Minor Side Track - `argv[0]` and the `ln` command
 
 If you recall, the signature of a C main function is:
 
@@ -224,24 +227,23 @@ If you recall, the signature of a C main function is:
 int main(int argc, char *argv[])
 ```
 
-where ```argc``` is the number of command line arguments
-and ```argv``` is a list of character pointers (strings).
-The value of ```argv[0]``` is the path of the file containing
+where `argc` is the number of command line arguments
+and `argv` is a list of character pointers (strings).
+The value of `argv[0]` is the path of the file containing
 the program being executed. Many UNIX utility programs with
 complementary functions (e.g. compress and uncompress ) look
 like two programs, but in fact they are one program with two names
 in the filesystem. The two-name trick is accomplished by creating
-a filesystem "link" using the ```ln``` command.
+a filesystem "link" using the `ln` command.
 
-An example from ```/usr/bin``` on my laptop is:
-```bash
-   $ ls -li /usr/bin/git*
-3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/git
-3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/git-receive-pack
-...
+An example from the directory `/usr/bin` on my laptop is:
+```console
+$ ls -li /usr/bin/*compress | grep 3376
+3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/compress
+3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/uncompress
 ```
 
-Here ```git``` and ```git-receive-pack``` are the same file with
+Here `compress` and `uncompress` are the same file with
 different names. We can tell it's the same file since they have the
 same i-node number (the first column). An i-node is a feature of the
 UNIX filesystem and is super outside the scope of this article, but
@@ -250,116 +252,119 @@ not [this one][article-unix-fs].
 Good and/or lazy programmers can use this feature of the UNIX
 filesystem to write less code but double the number of programs they
 deliver. First we write a program that changes it's behavior based on
-the value of ```argv[0]``` and then we make sure to create links with
+the value of `argv[0]` and then we make sure to create links with
 the names that cause the behavior.
 
-In our Makefile, the ```unmeow``` link is created using this recipe:
+In our Makefile, the `unmeow` link is created using this recipe:
 
 ```Makefile
-    # Makefile
-    ...
-    $(DECODER): $(ENCODER)
-            $(LN) -f $< $@
-	...
+# Makefile
+...
+$(DECODER): $(ENCODER)
+	$(LN) -f $< $@
+...
 ```
 
 I tend to parameterize everything in my Makefiles, rarely using a
 "bare" string. I group all the definitions at the top of the Makefile
 which makes it easy to find them and change them. This makes a big
 difference when you are trying to port software to a new platform
-and you need to change all your rules to use ```xcc``` instead of
-```cc```.
+and you need to change all your rules to use `cool-new-cc` instead of
+`cc`.
 
 The recipe should appear relatively straightforward except for the two
-built-in variables ```$@``` and ```$<```. The first is a short cut for
-the target of the recipe; in this case ```$(DECODER)```. I remember that
-because the at-sign looks like a target to me. The second, ```$<``` is
-the rule dependency, in this case it resolves to ```$(ENCODER)```.
+built-in variables `$@` and `$<`. The first is a short cut for
+the target of the recipe; in this case `$(DECODER)`. I remember that
+because the at-sign looks like a target to me. The second varaible `$<` is
+the rule dependency. In this case it resolves to `$(ENCODER)`.
 
 Things are getting complex for sure, but it's managed.
 
-### Exploring ```main.c```
+### Exploring `main.c`
 
-The structure of the ```main.c``` file for ```meow```/```unmeow```
+The structure of the `main.c` file for `meow`/`unmeow`
 should be familiar to my [long-time readers][1], and has the
 following general outline:
 
 ```C
-   /* main.c - MeowMeow, a stream encoder/decoder */
+/* main.c - MeowMeow, a stream encoder/decoder */
 
-   /* 00 system includes */
-   /* 01 project includes */
-   /* 02 externs */
-   /* 03 defines */
-   /* 04 typedefs */
-   /* 05 globals (but don't)*/
-   /* 06 ancillary function prototypes if any */
+/* 00 system includes */
+/* 01 project includes */
+/* 02 externs */
+/* 03 defines */
+/* 04 typedefs */
+/* 05 globals (but don't)*/
+/* 06 ancillary function prototypes if any */
    
-   int main(int argc, char *argv[])
-   {
-     /* 07 variable declarations */
-     /* 08 check argv[0] to see how the program was invoked */
-     /* 09 process the command line options from the user */
-     /* 10 do the needful */
-   }
+int main(int argc, char *argv[])
+{
+  /* 07 variable declarations */
+  /* 08 check argv[0] to see how the program was invoked */
+  /* 09 process the command line options from the user */
+  /* 10 do the needful */
+}
    
-   /* 11 ancillary functions if any */
+/* 11 ancillary functions if any */
 ```
 
 ### Including Project Header Files
 
-The second section, ```/* 01 project includes /*``` reads like this from the source:
+The second section, `/* 01 project includes /*` reads like this from the source:
 
 ```C
-   /* main.c - MeowMeow, a stream encoder/decoder */
-   ...
-   /* 01 project includes */
-   #include "main.h"
-   #include "mmecode.h"
-   #include "mmdecode.h"
+/* main.c - MeowMeow, a stream encoder/decoder */
+...
+/* 01 project includes */
+#include "main.h"
+#include "mmecode.h"
+#include "mmdecode.h"
 ```
 
-The ```#include``` directive is a C pre-processor command that causes
+The `#include` directive is a C pre-processor command that causes
 the contents of the named file to be "included" at this point in the file.
 If the programmer uses double-quotes around the name of the header file,
 the compiler will look for that file in the current directory. If the file
 is enclosed in &lt;&gt;, it will look for the file in a set of predefined
 directories.
 
-The file [```main.h```][7] contains definitions and typedefs that are used
-in [```main.c```][8]. I like to collect these things here in case I want
+The file [`main.h`][7] contains definitions and typedefs that are used
+in [`main.c`][8]. I like to collect these things here in case I want
 to use those definitions elsewhere in my program.
 
-The files [```mmencode.h```][9] and [```mmdecode.h```][11]
-are nearly identical so I'll break down ```mmencode.h```.
+The files [`mmencode.h`][9] and [`mmdecode.h`][11]
+are nearly identical so I'll break down `mmencode.h`.
 
 ```C
-    /* mmencode.h - MeowMeow, a stream encoder/decoder */
+/* mmencode.h - MeowMeow, a stream encoder/decoder */
     
-    #ifndef _MMENCODE_H
-    #define _MMENCODE_H
+#ifndef _MMENCODE_H
+#define _MMENCODE_H
     
-    #include <stdio.h>
+#include <stdio.h>
     
-    int mm_encode(FILE *src, FILE *dst);
+int mm_encode(FILE *src, FILE *dst);
     
-    #endif	/* _MMENCODE_H */
+#endif	/* _MMENCODE_H */
 ```
 
-The **```#ifndef, #define, #endif```** construction is collectively
+The `#ifndef`, `#define`, `#endif` construction is collectively
 known as a "guard". This keeps the C compiler from including this file
 more than once per file. The compiler will complain if it finds
 multiple definitions/prototypes/declarations so the guard is a **must
-have** for header files.
+have** for header files. Yes, some compilers provide support for only including
+a header once, but once you release your software you lose control over
+what compiler is used to build your source. Always include a guard in your
+headers.
 
-Inside the guard, there are only two things; a ```#include```
-directive and a function prototype declaration. I include ```stdio.h```
-here to bring in the definition of ```FILE``` which is used in
+Inside the guard, there are only two things; a `#include`
+directive and a function prototype declaration. I include `stdio.h`
+here to bring in the definition of `FILE` which is used in
 the function prototype. The function prototype can be included
 by other C files to establish that function in the file's namespace.
 You can think of each file as a seperate **namespace** which means
 variables and functions in one file are not usable by functions or
-variables in another file. 
+variables in another file.
 
 Writing header files is complex and it is tough to manage in larger
 projects. Use guards. I have more thoughts about
@@ -392,17 +397,17 @@ operate upon. Here is the encoding loop:
 ```
 
 In plain English, this loop reads in a chunk of the file while there
-are chunks left to read (```feof(3)``` and ```fgets(3)```). Then it
-splits each byte in the chunk into ```hi``` and ```lo```
+are chunks left to read (`feof(3)` and `fgets(3)`). Then it
+splits each byte in the chunk into `hi` and `lo`
 nibbles. Remember, a nibble is half of a byte, or four bits. The real
 magic here is realizing that four bits can encode sixteen values. I
-use ```hi``` and ```lo``` as indices into a sixteen string lookup
-table, ```tbl```, that contains the **MeowMeow** strings that encode
-each nibble. Those strings are written to the destination ```FILE```
-stream using ```fputs(3)``` and then we move on to the next byte in
+use `hi` and `lo` as indices into a sixteen string lookup
+table, `tbl`, that contains the **MeowMeow** strings that encode
+each nibble. Those strings are written to the destination `FILE`
+stream using `fputs(3)` and then we move on to the next byte in
 the buffer.
 
-The table is initialized with a macro defined in [```table.h```][12]
+The table is initialized with a macro defined in [`table.h`][12]
 for no particular reason except to demonstrate including another project
 local header file and I like [initialization macros][13].
 
@@ -427,10 +432,10 @@ strings and then reverse the encoding from strings to bytes.
 	
 Not what you were expecting?
 
-Here, I'm exposing the function ```stupid_decode()``` via the
-externally visible ```mm_decode()``` function. When I say "externally"
-I mean outside this file. Since ```stupid_decode()``` isn't in the
-header file, it isn't available to be called in other files.
+Here, I'm exposing the function `stupid_decode()` via the
+externally visible `mm_decode()` function. When I say "externally"
+visible I mean visible outside this file. Since `stupid_decode()` isn't in the
+header file, it isn't available to be called directly from functions in other files.
 
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
@@ -469,7 +474,7 @@ of single byte writes to the destination stream.
 ```
 
 Instead of using the bit-shifting technique I used in the encoder, I
-elected to create a custom data structure called ```decoded_byte_t```.
+elected to create a custom data structure called `decoded_byte_t`.
 
 ```C
     /* mmdecode.c - MeowMeow, a stream decoder/decoder */
@@ -494,28 +499,28 @@ elected to create a custom data structure called ```decoded_byte_t```.
 ```
 
 It's a little complex when viewed all at once, but hang tough.  
-The ```decoded_byte_t``` is defined as a ```union``` of a ```fields_t```
-and an ```unsigned char```.  The named members of a union can be
+The `decoded_byte_t` is defined as a `union` of a `fields_t`
+structure and an `unsigned char`.  The named members of a union can be
 thought of as aliases for the same region of memory. In this
-case, ```value``` and ```field``` refer to the same eight-bit region of
-memory. Setting ```field.f0``` to 1 would also set the least
-significant bit in ```value```.
+case, `value` and `field` refer to the same eight-bit region of
+memory. Setting `field.f0` to 1 would also set the least
+significant bit in `value`.
 
-While ```unsigned char``` shouldn't be a mystery, the ```typedef```
-for ```fields_t``` might look a little unfamiliar. Modern C compilers
-allow programmers to specify 'bit fields' in a ```struct```, the field
+While the type `unsigned char` shouldn't be a mystery, the `typedef`
+for `fields_t` might look a little unfamiliar. Modern C compilers
+allow programmers to specify 'bit fields' in a `struct`. The field
 type needs to be an unsigned integral type and the member identifer is
 followed by a colon and an integer that specifies the length of the
 bit field.
 
 This data structure makes it simple to access each bit in the byte by
-field name and then access the assembled value via the ```value```
+field name and then access the assembled value via the `value`
 field of the union. We depend on the compiler to generate the correct
 bit-shifting instructions to access the fields, which can save you a
 lot heartburn when you are debugging.
 
-Lastly, ```stupid_decode()``` is *stupid* because it only reads eight
-bytes at time from the source ```FILE``` stream. Normally, we try to
+Lastly, `stupid_decode()` is *stupid* because it only reads eight
+bytes at time from the source `FILE` stream. Normally, we try to
 minimize the number of reads and writes to improve performance. I
 explain the cost of system calls in more detail [here][article-syscalls],
 but for now just remember reading or writing a bigger chunk less often
@@ -525,7 +530,7 @@ frequently.
 ### The Wrap Up
 
 Writing a multi-file program in C requires a little more planning on
-behalf of the programmer than just a single ```main.c```. But just a
+behalf of the programmer than just a single `main.c`. But just a
 little effort up front can save a lot of time and headache when you
 refactor as you add functionality.
 
@@ -533,8 +538,8 @@ To recap, I like to have a lot of files with a few short functions in
 them. I like to expose a small subset of the functions in those files
 via header files. I like to keep my constants in header files, both
 numeric and string constants. I **love** Makefiles and use them
-instead of ```bash``` scripts to automate all sorts of things.
-I like my```main()``` function to handle command-line argument parsing
+instead of `bash` scripts to automate all sorts of things.
+I like my `main()` function to handle command-line argument parsing
 and act as a scaffold for the primary functionality of the program.
 
 I know I've only touched the surface of what's going on in this simple
