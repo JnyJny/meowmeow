@@ -155,7 +155,7 @@ integrated development environment to write the next blockbuster app
 and building your project consists of mashing on
 "Ctrl-Meta-Shift-Alt-Super-B". But back in my day, and also today,
 lots of useful work got done by C programs built with makefiles. A
-makefile is a text file that contains recipes for working with files
+makefile is a text file, typically named **Makefile**, that contains recipes for working with files
 and programmers use it to automate building their program binaries
 from source (and other stuff too!) using the [`make`][13] command-line
 utility.
@@ -169,7 +169,7 @@ For instance, this little gem:
 03 	cc -o my_sweet_program main.c
 ```
 
-Text after an octothorpe/pound/hash is a comment, like line 00.
+Text after an [octothorpe][15] is a comment, like line 00.
 
 Line 01 is a variable assignment where the variable TARGET takes on
 the string value "my_sweet_program". By convention, ok my
@@ -568,6 +568,7 @@ comments to let me know.
 [12]: https://github.com/JnyJny/table.h
 [13]: https://en.wikipedia.org/wiki/Make_(software)
 [14]: http://harmful.cat-v.org/cat-v/
+[15]: https://en.wikipedia.org/wiki/Octothorpe
 
 
 <!-- Links to articles referenced by this article that remain to be written -->
