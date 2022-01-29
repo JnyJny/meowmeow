@@ -61,10 +61,10 @@ and awesome programs, so lets write a program that reads and writes files.
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
 When I was a dewy-eyed kid studying computer science in the late 80s,
-and early 90s, there were an actual plethora of encoding schemes. Some of
-them were for compressing files, some were for packaging files together and
-others had no purpose but to be excrutiatingly silly. An example of
-the last is the [MooMoo encoding scheme][3].
+and early 90s, there were an actual plethora of encoding schemes. Some
+of them were for compressing files, some were for packaging files
+together and others had no purpose but to be excrutiatingly silly. An
+example of the last is the [MooMoo encoding scheme][3].
 
 To give our program a purpose, I'll update this concept for the
 [2000s][4] and implement a MeowMeow encoding since the Internet loves
@@ -72,7 +72,7 @@ cats. The basic idea here is to take files and encode each nibble
 (half of a byte) with the text "meow". A lower-case letter indicates a
 zero and upper-case indicates a one. Yes, it will balloon the size of
 a file since we are trading four bits for thirty two bits. Yes, it's
-pointless. But imagine the surpise on someone's face when this
+pointless. But just imagine the surpise on someone's face when this
 happens:
 
 ```console
@@ -144,8 +144,8 @@ later, but in brief those are called _header_ files and they can
 contain C language type definitions and C preprocessor
 directives. Header files should **not** have any functions in them.
 You can think of headers as a definition of the application programming
-interface (API) offered by the ```.c``` flavored file that is used
-by other ```.c``` files.
+interface (API) offered by the `.c` flavored file that is used
+by other `.c` files.
 
 ### But What The Heck is a Makefile?
 
@@ -296,7 +296,7 @@ following general outline:
 /* 04 typedefs */
 /* 05 globals (but don't)*/
 /* 06 ancillary function prototypes if any */
-   
+
 int main(int argc, char *argv[])
 {
   /* 07 variable declarations */
@@ -304,7 +304,7 @@ int main(int argc, char *argv[])
   /* 09 process the command line options from the user */
   /* 10 do the needful */
 }
-   
+
 /* 11 ancillary functions if any */
 ```
 
@@ -380,32 +380,31 @@ determining which operation to use and opening the files that we'll
 operate upon. Here is the encoding loop:
 
 ```C
-    /* mmencode.c - MeowMeow, a stream encoder/decoder */
-    ...
-        while (!feof(src)) {
-	    
-          if (!fgets(buf, sizeof(buf), src))
-            break;
-	      
-          for(i=0; i<strlen(buf); i++) {
-            lo = (buf[i] & 0x000f);
-            hi = (buf[i] & 0x00f0) >> 4;
-            fputs(tbl[hi], dst);
-            fputs(tbl[lo], dst);
-          }
-	    }
+/* mmencode.c - MeowMeow, a stream encoder/decoder */
+...
+    while (!feof(src)) {
+
+      if (!fgets(buf, sizeof(buf), src))
+        break;
+
+      for(i=0; i<strlen(buf); i++) {
+        lo = (buf[i] & 0x000f);
+        hi = (buf[i] & 0x00f0) >> 4;
+        fputs(tbl[hi], dst);
+        fputs(tbl[lo], dst);
+      }
+    }
 ```
 
 In plain English, this loop reads in a chunk of the file while there
-are chunks left to read (`feof(3)` and `fgets(3)`). Then it
-splits each byte in the chunk into `hi` and `lo`
-nibbles. Remember, a nibble is half of a byte, or four bits. The real
-magic here is realizing that four bits can encode sixteen values. I
-use `hi` and `lo` as indices into a sixteen string lookup
-table, `tbl`, that contains the **MeowMeow** strings that encode
-each nibble. Those strings are written to the destination `FILE`
-stream using `fputs(3)` and then we move on to the next byte in
-the buffer.
+are chunks left to read (`feof(3)` and `fgets(3)`). Then it splits
+each byte in the chunk into `hi` and `lo` nibbles. Remember, a nibble
+is half of a byte, or four bits. The real magic here is realizing that
+four bits can encode sixteen values. I use `hi` and `lo` as indices
+into a sixteen string lookup table, `tbl`, that contains the
+**MeowMeow** strings that encode each nibble. Those strings are
+written to the destination `FILE` stream using `fputs(3)` and then we
+move on to the next byte in the buffer.
 
 The table is initialized with a macro defined in [`table.h`][12]
 for no particular reason except to demonstrate including another project
@@ -418,24 +417,25 @@ it working. The decode loop is similar; read a buffer full of **MeowMeow**
 strings and then reverse the encoding from strings to bytes. 
 
 ```C
-    /* mmdecode.c - MeowMeow, a stream decoder/decoder */
-    ...
-    int mm_decode(FILE *src, FILE *dst)
-    {
-      if (!src || !dst) {
-        errno = EINVAL;
-        return -1;
-      }
-      return stupid_decode(src, dst);
-    }
+/* mmdecode.c - MeowMeow, a stream decoder/decoder */
+...
+int mm_decode(FILE *src, FILE *dst)
+{
+  if (!src || !dst) {
+    errno = EINVAL;
+    return -1;
+  }
+  return stupid_decode(src, dst);
+}
 ```
 	
 Not what you were expecting?
 
-Here, I'm exposing the function `stupid_decode()` via the
-externally visible `mm_decode()` function. When I say "externally"
-visible I mean visible outside this file. Since `stupid_decode()` isn't in the
-header file, it isn't available to be called directly from functions in other files.
+Here, I'm exposing the function `stupid_decode()` via the externally
+visible `mm_decode()` function. When I say "externally" visible I mean
+visible outside this file. Since `stupid_decode()` isn't in the header
+file, it isn't available to be called directly from functions in other
+files.
 
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
@@ -447,30 +447,30 @@ implementation would also buffer the output bytes to reduce the number
 of single byte writes to the destination stream.
 
 ```C
-    /* mmdecode.c - MeowMeow, a stream decoder/decoder */
-    ...
-    int stupid_decode(FILE *src, FILE *dst)
-    {
-      char           buf[9];
-      decoded_byte_t byte;
-      int            i;
-      
-      while (!feof(src)) {
-        if (!fgets(buf, sizeof(buf), src))
-          break;
-        byte.field.f0 = isupper(buf[0]);
-        byte.field.f1 = isupper(buf[1]);
-        byte.field.f2 = isupper(buf[2]);
-        byte.field.f3 = isupper(buf[3]);
-        byte.field.f4 = isupper(buf[4]);
-        byte.field.f5 = isupper(buf[5]);
-        byte.field.f6 = isupper(buf[6]);
-        byte.field.f7 = isupper(buf[7]);
-        
-        fputc(byte.value, dst);
-      }
-      return 0;
-    }
+/* mmdecode.c - MeowMeow, a stream decoder/decoder */
+...
+int stupid_decode(FILE *src, FILE *dst)
+{
+  char           buf[9];
+  decoded_byte_t byte;
+  int            i;
+
+  while (!feof(src)) {
+    if (!fgets(buf, sizeof(buf), src))
+      break;
+    byte.field.f0 = isupper(buf[0]);
+    byte.field.f1 = isupper(buf[1]);
+    byte.field.f2 = isupper(buf[2]);
+    byte.field.f3 = isupper(buf[3]);
+    byte.field.f4 = isupper(buf[4]);
+    byte.field.f5 = isupper(buf[5]);
+    byte.field.f6 = isupper(buf[6]);
+    byte.field.f7 = isupper(buf[7]);
+
+    fputc(byte.value, dst);
+  }
+  return 0;
+}
 ```
 
 Instead of using the bit-shifting technique I used in the encoder, I
@@ -490,21 +490,19 @@ elected to create a custom data structure called `decoded_byte_t`.
       unsigned char f1:1;
       unsigned char f0:1;
     } fields_t;
-    
+
     typedef union {
       fields_t      field;
       unsigned char value;
     } decoded_byte_t;
-
 ```
 
-It's a little complex when viewed all at once, but hang tough.  
-The `decoded_byte_t` is defined as a `union` of a `fields_t`
-structure and an `unsigned char`.  The named members of a union can be
-thought of as aliases for the same region of memory. In this
-case, `value` and `field` refer to the same eight-bit region of
-memory. Setting `field.f0` to 1 would also set the least
-significant bit in `value`.
+It's a little complex when viewed all at once, but hang tough.  The
+`decoded_byte_t` is defined as a `union` of a `fields_t` structure and
+an `unsigned char`.  The named members of a union can be thought of as
+aliases for the same region of memory. In this case, `value` and
+`field` refer to the same eight-bit region of memory. Setting
+`field.f0` to 1 would also set the least significant bit in `value`.
 
 While the type `unsigned char` shouldn't be a mystery, the `typedef`
 for `fields_t` might look a little unfamiliar. Modern C compilers
@@ -538,9 +536,9 @@ To recap, I like to have a lot of files with a few short functions in
 them. I like to expose a small subset of the functions in those files
 via header files. I like to keep my constants in header files, both
 numeric and string constants. I **love** Makefiles and use them
-instead of `bash` scripts to automate all sorts of things.
-I like my `main()` function to handle command-line argument parsing
-and act as a scaffold for the primary functionality of the program.
+instead of bash scripts to automate all sorts of things. I like my
+`main()` function to handle command-line argument parsing and act as a
+scaffold for the primary functionality of the program.
 
 I know I've only touched the surface of what's going on in this simple
 program and I'm excited to learn what things were helpful to you and
@@ -577,3 +575,4 @@ comments to let me know.
 [article-files]: https://github.com/JnyJny/meowmeow/articles/60-Working-With-Files.md
 [article-compiling]: https://github.com/JnyJny/meowmeow/articles/70-Compiling.md
 [article-shared-object]: https://github.com/JnyJny/meowmeow/articles/80-Shared-Object.md
+?
