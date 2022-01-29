@@ -56,7 +56,8 @@ whose stdout is redirected to `sed` whose stdout is redirected to
 write to a file called 'ack' in the current directory.
 
 We want our program to play well in this ecosystem of equally flexible
-and awesome programs, so lets write a program that reads and writes files.
+and awesome programs, so lets write a program that reads and writes
+files.
 
 ### Concept: MeowMeow - A Stream Encoder/Decoder
 
@@ -77,7 +78,7 @@ someone's face when this happens:
 
 ```console
 $ cat /home/your_sibling/.super_secret_journal_of_my_innermost_thoughts
-MeOWmeOWmeowMEoW...
+mEowmEowmEOwmEoWmEOwmeoWmEOWmeOwmeOwmeowmEOwmEowmEOwMeoWmEOwmeoWmEOWmeOwmEOWMeoWmeOwMEowmeowMeOwmeowMeOwmEoWmEowmEOwMEOWmEOwmEowmEOwmeoWmEOWMeoWmeOwmeowmEOwMeoWmEOWmeOWmeOwmeowmEoWmeOWmEOwmeoWmEOWmEowmEOWmEoWmEOWmeOwmEOwmEowmEOwmeoWmEOWMeoWmeOwMEowmeOwmeowmeOWmeowmeOWmeoWmeOwMEoWmeOWmeOwmeOWMeoWmeOwMEoWmeOWmeOwmeOWmeowmeOWmeOwmeOWmeOwmeOwMEowmeOwmeowmEOwmeoWmEOwMEOwmEOwmEowmeOwmeowmEowMeoWmeOwmeowmEOwmeOWmEOwmeoWmEOwMEOwmeOwmEOWmEOWmEowmeOwmeowmEOwmeOwmEOwmEoWmEOwMEowmEOwMeoWmEOwmEoWmEOWmEOwmEOwmEoWmeOwmeowmEOwMEoWmEOWMeoWmeOwmeowmEOwMEowmEOWmEoWmEOwmeOWmEOwMeOWmeOwmeoWmeowMeOw
 ```
 
 This is going to be _awesome_.
@@ -135,10 +136,10 @@ the program and they will curse your name if you have all 2049
 functions in one file.
 
 So we good and true programmers break functions out, grouping like
-functions into seperate files. Here I've got files **`main.c`**,
-**`mmencode.c`**, and **`mmdecode.c`**. For small programs
-like this, it may seem like overkill. But small programs rarely stay
-small, so planning for expansion is a "Good Idea".
+functions into seperate files. Here I've got files [main.c][10],
+[mmencode.c][13], and [mmdecode.c][15]. For small programs like this,
+it may seem like overkill. But small programs rarely stay small, so
+planning for expansion is a "Good Idea".
 
 But what about those `.h` files? I'll explain them in general terms
 later, but in brief those are called _header_ files and they can
@@ -150,15 +151,15 @@ file that is used by other `.c` files.
 
 ### But What The Heck is a Makefile?
 
-I know all you cool kids are using the **"Ultra CodeShredder 3000™"**
-integrated development environment to write the next blockbuster app
-and building your project consists of mashing on
+I know all you cool kids are using the **"Ultra CodeShredder 3000™
+V0.4-beta"** integrated development environment to write the next
+blockbuster app and building your project consists of mashing on
 "Ctrl-Meta-Shift-Alt-Super-B". But back in my day, and also today,
 lots of useful work got done by C programs built with makefiles. A
-makefile is a text file, typically named **Makefile**, that contains recipes for working with files
-and programmers use it to automate building their program binaries
-from source (and other stuff too!) using the [`make`][13] command-line
-utility.
+makefile is a text file, typically named "**Makefile**", that contains
+recipes for working with files which programmers use to automate
+building their program binaries from source (and other stuff too!)
+using the [make][13] command-line utility.
 
 For instance, this little gem:
 
@@ -169,7 +170,7 @@ For instance, this little gem:
 03 	cc -o my_sweet_program main.c
 ```
 
-Text after an [octothorpe][15] is a comment, like line 00.
+Text after an [octothorpe][17] is a comment, like line 00.
 
 Line 01 is a variable assignment where the variable TARGET takes on
 the string value "my_sweet_program". By convention, ok my
@@ -196,22 +197,22 @@ Makefile  main.c  my_sweet_program
 
 Could you build your C program without a makefile? Yes, but why?
 
-The [makefile][11] that will build our MeowMeow encoder/decoder is
+The [makefile][16] that will build our MeowMeow encoder/decoder is
 only a little more sophisticated than this example, but the basic
 structure is the same. I'll break it down [Barney-style][article-makefile]
 for you, and you'll be writing cool makefiles in no time.
 
 ### Form Follows Function
 
-My idea here is to write a program that reads a file, transforms it
-and then writes the transformed data to another file. The following
-fabricated command-line interaction is how I imagine using the
-program:
+My idea for this exercise is to write a program that reads a file,
+transforms it and then writes the transformed data to another
+file. The following fabricated command-line interaction is how I
+imagine using the program:
 
 ```console
-$ meow < clear.txt > clear.meow
-$ unmeow < clear.meow > meow.tx
-$ diff clear.txt meow.tx
+$ meow < clear.txt > meow.txt       # transform clear text to meowmeow text
+$ unmeow < meow.txt > unmeowed.tx   # transform meowmeow text to clear textt
+$ diff clear.txt unmeowed.txt       # compare the original file to the unmeowed file
 $
 ```
 
@@ -231,16 +232,15 @@ If you recall, the signature of a C main function is:
 int main(int argc, char *argv[])
 ```
 
-where `argc` is the number of command-line arguments
-and `argv` is a list of character pointers (strings).
-The value of `argv[0]` is the path of the file containing
-the program being executed. Many Unix utility programs with
-complementary functions (e.g. compress and uncompress ) look
-like two programs, but in fact they are one program with two names
-in the filesystem. The two-name trick is accomplished by creating
-a filesystem "link" using the `ln` command.
+where `argc` is the number of command-line arguments and `argv` is a
+list of character pointers (strings).  The value of `argv[0]` is the
+path of the file containing the program being executed. Many Unix
+utility programs with complementary functions (e.g. compress and
+uncompress ) look like two programs, but in fact they are somteimes
+one program with two names in the filesystem. The two-name trick is
+accomplished by creating a filesystem "link" using the `ln` command.
 
-An example from the directory `/usr/bin` on my laptop is:
+An example from the directory `/usr/bin` on a fictional computer is:
 ```console
 $ ls -li /usr/bin/*compress | grep 3376
 3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/compress
@@ -259,7 +259,7 @@ deliver. First we write a program that changes it's behavior based on
 the value of `argv[0]` and then we make sure to create links with
 the names that cause the behavior.
 
-In our makefile, the `unmeow` link is created using this recipe:
+In our [makefile][16], the `unmeow` link is created using this recipe:
 
 ```Makefile
 # Makefile
@@ -286,9 +286,9 @@ Things are getting complex for sure, but it's managed.
 
 ### Exploring `main.c`
 
-The structure of the `main.c` file for `meow`/`unmeow`
-should be familiar to my [long-time readers][1], and has the
-following general outline:
+The structure of the [main.c][11] file for `meow`/`unmeow` should be
+familiar to my [long-time readers][1], and has the following general
+outline:
 
 ```C
 /* main.c - MeowMeow, a stream encoder/decoder */
@@ -314,7 +314,8 @@ int main(int argc, char *argv[])
 
 ### Including Project Header Files
 
-The second section, `/* 01 project includes /*` reads like this from the source:
+The second section, `/* 01 project includes /*` reads like this from
+the source:
 
 ```C
 /* main.c - MeowMeow, a stream encoder/decoder */
@@ -329,15 +330,15 @@ The `#include` directive is a C pre-processor command that causes
 the contents of the named file to be "included" at this point in the file.
 If the programmer uses double-quotes around the name of the header file,
 the compiler will look for that file in the current directory. If the file
-is enclosed in &lt;&gt;, it will look for the file in a set of predefined
+is enclosed in `<>`, it will look for the file in a set of predefined
 directories.
 
-The file [`main.h`][7] contains definitions and typedefs that are used
-in [`main.c`][8]. I like to collect these things here in case I want
+The file [main.h][10] contains definitions and typedefs that are used
+in [main.c][11]. I like to collect these things here in case I want
 to use those definitions elsewhere in my program.
 
-The files [`mmencode.h`][9] and [`mmdecode.h`][11]
-are nearly identical so I'll break down `mmencode.h`.
+The files [mmencode.h][12] and [mmdecode.h][14] are nearly
+identical so I'll break down `mmencode.h`.
 
 ```C
 /* mmencode.h - MeowMeow, a stream encoder/decoder */
@@ -352,14 +353,14 @@ int mm_encode(FILE *src, FILE *dst);
 #endif	/* _MMENCODE_H */
 ```
 
-The `#ifndef`, `#define`, `#endif` construction is collectively
-known as a "guard". This keeps the C compiler from including this file
-more than once per file. The compiler will complain if it finds
-multiple definitions/prototypes/declarations so the guard is a **must
-have** for header files. Yes, some compilers provide support for only including
-a header once, but once you release your software you lose control over
-what compiler is used to build your source. Always include a guard in your
-headers.
+The `#ifndef`, `#define`, `#endif` construction is collectively known
+as a "guard". This keeps the C compiler from including this file more
+than once per file. The compiler will complain if it finds multiple
+definitions/prototypes/declarations so the guard is a **must have**
+for header files. Yes, some compilers provide support for only
+including a header once, but once you release your software you lose
+control over what compiler is used to build your source. Always
+include a guard in your headers.
 
 Inside the guard, there are only two things; a `#include`
 directive and a function prototype declaration. I include `stdio.h`
@@ -410,7 +411,7 @@ into a sixteen string lookup table, `tbl`, that contains the
 written to the destination `FILE` stream using `fputs(3)` and then we
 move on to the next byte in the buffer.
 
-The table is initialized with a macro defined in [`table.h`][12]
+The table is initialized with a macro defined in [table.h][17]
 for no particular reason except to demonstrate including another project
 local header file and I like [initialization macros][13].
 
@@ -418,7 +419,8 @@ local header file and I like [initialization macros][13].
 
 Alright, I'll admit it took me a couple of runs at this before I got
 it working. The decode loop is similar; read a buffer full of **MeowMeow**
-strings and then reverse the encoding from strings to bytes. 
+strings and then reverse the encoding from strings to bytes. From the
+file [mmdecode.c][15]:
 
 ```C
 /* mmdecode.c - MeowMeow, a stream decoder/decoder */
@@ -438,12 +440,13 @@ Not what you were expecting?
 Here, I'm exposing the function `stupid_decode()` via the externally
 visible `mm_decode()` function. When I say "externally" visible I mean
 visible outside this file. Since `stupid_decode()` isn't in the header
-file, it isn't available to be called directly from functions in other
-files.
+file [mmdecode.h`[14], it isn't available to be called directly from
+functions in other files.
 
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
-problem. In my case, I've written a I/O intensive function that reads
+problem or we have different versions for different hardware or software
+platforms. In my case, I've written a I/O intensive function that reads
 eight bytes at a time from the source stream to decode one byte to
 write to the destination stream. A better implementation would work on
 a buffer bigger than eight bytes at a time. A **much** better
@@ -549,7 +552,7 @@ program and I'm excited to learn what things were helpful to you and
 which topics need better explanations. Share your thoughts in the
 comments to let me know.
 
-<!-- fin -->
+<!-- fin, end links follow -->
 
 [0]: https://github.com/JnyJny/meowmeow.git
 [1]: https://opensource.com/article/19/5/how-write-good-c-main-function
@@ -558,18 +561,20 @@ comments to let me know.
 [4]: https://en.wikipedia.org/wiki/Cats_and_the_Internet
 [5]: https://en.wikipedia.org/wiki/Endianness
 [6]: https://git-scm.com
-[7]: https://github.com/JnyJny/meowmeow/blob/master/main.h
-[8]: https://github.com/JnyJny/meowmeow/blob/master/main.c
-[9]:  https://github.com/JnyJny/meowmeow/blob/master/mmencode.h
-[10]: https://github.com/JnyJny/meowmeow/blob/master/mmencode.c
-[11]: https://github.com/JnyJny/meowmeow/blob/master/mmdecode.h
-[10]: https://github.com/JnyJny/meowmeow/blob/master/mmdecoder.c
-[11]: https://github.com/JnyJny/meowmeow/blob/master/Makefile
-[12]: https://github.com/JnyJny/meowmeow/blob/master/table.h
-[13]: https://en.wikipedia.org/wiki/Make_(software)
-[14]: http://harmful.cat-v.org/cat-v/
-[15]: https://en.wikipedia.org/wiki/Octothorpe
+[7]: https://en.wikipedia.org/wiki/Make_(software)
+[8]: http://harmful.cat-v.org/cat-v/
+[9]: https://en.wikipedia.org/wiki/Octothorpe
 
+<!-- GitHub project file links -->
+
+[10]: https://github.com/JnyJny/meowmeow/blob/master/main.h
+[11]: https://github.com/JnyJny/meowmeow/blob/master/main.c
+[12]: https://github.com/JnyJny/meowmeow/blob/master/mmencode.h
+[13]: https://github.com/JnyJny/meowmeow/blob/master/mmencode.c
+[14]: https://github.com/JnyJny/meowmeow/blob/master/mmdecode.h
+[15]: https://github.com/JnyJny/meowmeow/blob/master/mmdecode.c
+[16]: https://github.com/JnyJny/meowmeow/blob/master/Makefile
+[17]: https://github.com/JnyJny/meowmeow/blob/master/table.h
 
 <!-- Links to articles referenced by this article that remain to be written -->
 
