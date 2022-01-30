@@ -440,16 +440,16 @@ Not what you were expecting?
 Here, I'm exposing the function `stupid_decode()` via the externally
 visible `mm_decode()` function. When I say "externally" visible I mean
 visible outside this file. Since `stupid_decode()` isn't in the header
-file [mmdecode.h`[14], it isn't available to be called directly from
+file [mmdecode.h][14], it isn't available to be called directly from
 functions in other files.
 
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
-problem or we have different versions for different hardware or software
-platforms. In my case, I've written a I/O intensive function that reads
-eight bytes at a time from the source stream to decode one byte to
-write to the destination stream. A better implementation would work on
-a buffer bigger than eight bytes at a time. A **much** better
+problem or we have different versions for different hardware or
+software platforms. In my case, I've written a I/O intensive function
+that reads eight bytes at a time from the source stream to decode one
+byte to write to the destination stream. A better implementation would
+work on a buffer bigger than eight bytes at a time. A _much_ better
 implementation would also buffer the output bytes to reduce the number
 of single byte writes to the destination stream.
 
