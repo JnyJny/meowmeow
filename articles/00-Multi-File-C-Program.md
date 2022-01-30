@@ -40,7 +40,7 @@ three files by default whenever a program is executed:
 
 - Standard Input  - `stdin`
 - Standard Output - `stdout`
-- Standard Error  - `stdout`
+- Standard Error  - `stderr`
 
 Two of these files are opened in write-only mode; `stdout` and `stderr`,
 while `stdin` is opened read-only. We see this in action whenever we use
