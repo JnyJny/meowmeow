@@ -8,9 +8,10 @@ boxes".
 In this article I'll name some things and manage some complexity while
 writing a small C program that is loosely based on the program
 structure I [discussed earlier][1], but different. This one will _do_
-something. Grab your favorite beverage, your favorite editor and
+something. Grab your favorite beverage, a trusty editor and
 compiler, crank up some tunes and let's write a mildly interesting C
-program together. Also, there won't be any boxes drawn yet.
+program together. For those waiting for the other shoe to drop, there
+won't be any boxes drawn ... yet.
 
 ### Philosophy of A Good Unix Program
 
@@ -50,7 +51,7 @@ file redirection in a command shell like `bash`:
 $ ls | grep foo | sed -e 's/bar/baz/g' > ack
 ```
 
-This construction can be described briefly as; the output of `ls`
+This construction can be described briefly as: the output of `ls`
 is written to stdout which is redirected to the stdin of `grep`
 whose stdout is redirected to `sed` whose stdout is redirected to
 write to a file called 'ack' in the current directory.
@@ -211,9 +212,9 @@ imagine using the program:
 
 ```console
 $ meow < clear.txt > meow.txt       # transform clear text to meowmeow text
-$ unmeow < meow.txt > unmeowed.tx   # transform meowmeow text to clear textt
+$ unmeow < meow.txt > unmeowed.tx   # transform meowmeow text to clear text
 $ diff clear.txt unmeowed.txt       # compare the original file to the unmeowed file
-$
+$                                   # no output means there was no difference
 ```
 
 We need to write code to handle command-line parsing and managing the
@@ -221,8 +222,8 @@ input and output streams. We need a function to encode a stream and
 write it to another stream. And finally we need a function to decode a
 stream and write it to another stream. Wait a second, I've only been
 talking about writing one program but in the example above I invoke
-two commands; `meow` and `unmeow`? I know you are probably
-thinking that this is getting complex as heck.
+two commands; `meow` and `unmeow`? I know you are probably thinking
+that this is getting complex as heck.
 
 ### Minor Side Track - `argv[0]` and the `ln` command
 
@@ -247,17 +248,11 @@ $ ls -li /usr/bin/*compress | grep 3376
 3376 -rwxr-xr-x. 113 root root     1.5M Aug 30  2018 /usr/bin/uncompress
 ```
 
-Here `compress` and `uncompress` are the same file with
-different names. We can tell it's the same file since they have the
-same i-node number (the first column). An i-node is a feature of the
-Unix filesystem and is super outside the scope of this article, but
-not [this one][article-unix-fs].
-
-Good and/or lazy programmers can use this feature of the Unix
-filesystem to write less code but double the number of programs they
-deliver. First we write a program that changes it's behavior based on
-the value of `argv[0]` and then we make sure to create links with
-the names that cause the behavior.
+Here `compress` and `uncompress` are the same file with different
+names. We can tell it's the same file since they have the same i-node
+number (the first column). An i-node is a feature of the Unix
+filesystem and is super outside the scope of this article, but not
+[this one][article-unix-fs].
 
 In our [makefile][16], the `unmeow` link is created using this recipe:
 
@@ -281,6 +276,34 @@ built-in variables `$@` and `$<`. The first is a short cut for
 the target of the recipe; in this case `$(DECODER)`. I remember that
 because the at-sign looks like a target to me. The second varaible `$<` is
 the rule dependency. In this case it resolves to `$(ENCODER)`.
+
+Good and/or lazy programmers can use this feature of the Unix
+filesystem to write less code but double the number of programs they
+deliver. First we write a program that changes it's behavior based on
+the value of `argv[0]` and then we make sure to create links with
+the names that cause the behavior.
+
+For instance, this simple `main()` checks to see if the execution was
+started with a file named "foo" or "bar" and executes a `foo()` or
+`bar()` function based on the file name.
+
+```C
+int foo(int argc, char **argv);
+int bar(int argc, char **argv);
+
+int main(int argc, char **argv) {
+
+  if (strncmp(argv[0], "foo", 3) == 0) {
+    return foo(argc, argv);
+  }
+
+  if strncmp(argv[0], "bar" 3) == 0) {
+    return bar(argc, argv);
+  }
+  
+  return -1
+}
+```
 
 Things are getting complex for sure, but it's managed.
 
@@ -446,7 +469,7 @@ functions in other files.
 Sometimes we do this when we want to publish a solid public interface
 but we aren't quite done noodling around with functions to solve a
 problem or we have different versions for different hardware or
-software platforms. In my case, I've written a I/O intensive function
+software platforms. In this case, I've written a I/O intensive function
 that reads eight bytes at a time from the source stream to decode one
 byte to write to the destination stream. A better implementation would
 work on a buffer bigger than eight bytes at a time. A _much_ better
