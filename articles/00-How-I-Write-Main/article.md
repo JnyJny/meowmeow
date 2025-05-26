@@ -149,24 +149,17 @@ called header.h in the system-defined header path, usually
 This is the minimum set of global includes that I'll use by default
 for the following capabilities:
 
-|#include File | Stuff It Provides|
-+--------------+------------------|
+| #include File | Stuff It Provides |
+| ------------- | ----------------- |
 |stdio	| Supplies FILE, stdin, stdout, stderr, and the fprint() family of functions|
-+--------------+------------------|
 |stdlib	| Supplies malloc(), calloc(), and realloc()|
-+--------------+------------------|
 |unistd	| Supplies EXIT_FAILURE, EXIT_SUCCESS|
-+--------------+------------------|
 |libgen	| Supplies the basename() function|
-+--------------+------------------|
 |errno	| Defines the external errno variable and it's values|
-+--------------+------------------|
 |string	| Supplies memcpy(), memset(), and the strlen() family of functions|
-+--------------+------------------|
 |getopt	| Supplies external optarg, opterr, optind, and getopt() function|
-+--------------+------------------|
 |sys/types |Typedef shortcuts like `uint32_t` and `uint64_t`|
-+--------------+------------------|
+
 
 ## 2. Defines
 
