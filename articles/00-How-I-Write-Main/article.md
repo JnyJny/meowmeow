@@ -592,17 +592,18 @@ int do_the_needful(options_t *options) {
 That's how I like to structure my C main files and you should too.
 
 <!-- End Links -->
-[linker-aliens]: XX-my-time-among-the-linker-aliens
-[c-std-libs]: c standard libraries
-[cpp-for-newbs]: something about cpp
-[man-pages]: what are they and how do you use them
-[s-u-e]: talk about structures, unions and enumerations
-[mutable-vs-immutable]: data, should it change?
-[madness-and-chaos]: NULL pointers
-[names-and-their-spaces]: more tales from the land of the linker aliens
-[unix-traditions]: argc,argv,grep, metasyntactic variables and the like
-[c-datatypes]: what is data and why does it need a type?
-[terse-c]: various C constructions you should be aware of
-[unix-signals]: oh boy, this is a doozie
-[goto-considered-harmful]: link to the seminal paper on the harms of goto
+[linker-aliens]: https://github.com/JnyJny/articles/c/XX-my-time-among-the-linker-aliens
+[c-std-libs]: https://github.com/JnyJny/articles/c/c-standard-libraries
+[cpp-for-newbs]: https://github.com/JnyJny/articles/c/something-about-cpp
+[man-pages]: https://github.com/JnyJny/articles/c/what-are-they-and-how-do-you-use-them
+[s-u-e]: https://github.com/JnyJny/articles/c/about-structures-unions-and-enumerations
+[mutable-vs-immutable]: https://github.com/JnyJny/articles/c/data-should-it-change
+[madness-and-chaos]: https://github.com/JnyJny/articles/c/NULL-pointers
+[names-and-their-spaces]: https://github.com/JnyJny/articles/c/more-tales-from-the-land-of-the-linker-aliens
+[unix-traditions]: https://github.com/JnyJny/articles/c/argc-argv-grep-metasyntactic-variables
+[c-datatypes]: https://github.com/JnyJny/articles/c/what-is-data-and-why-does-it-need-a-type
+[terse-c]: https://github.com/JnyJny/articles/c/various-C-constructions-you-should-be-aware-of
+[unix-signals]: https://github.com/JnyJny/articles/c/oh-boy-this-is-a-doozie
+[goto-considered-harmful]: https://github.com/JnyJny/articles/c/gotos-considered-harmful
 [source]: https://github.com/JnyJny/articles/c/00-howto-main/main.c
+
