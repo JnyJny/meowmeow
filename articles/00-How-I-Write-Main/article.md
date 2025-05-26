@@ -54,12 +54,11 @@ The main() function has two arguments that by
 [signed integer][c-datatypes]. Most Unix environments expect programs
 to return 0 (zero) on success and -1 (negative one) on failure.
 
-|Argument	|Name	        |Description|
-+-----------+---------------+-----------+
-|argc	    |Argument count	|Length of the argument vector|
-+-----------+---------------+-----------+
-|argv	    |Argument vector|Array of character pointers|
-+-----------+---------------+-----------+
+| Argument  | Name            | Description |
+| --------- | --------------- | ---- |
+| argc	    | Argument count	| Length of the argument vector|
+| argv	    | Argument vector | Array of character pointers|
+
 
 The argument vector, argv, is a tokenized representation of the
 command line that invoked your program. In the example above, argv
