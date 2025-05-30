@@ -3,7 +3,7 @@
 This project implements two commands in C, ```meow``` and ```unmeow```,
 that will encode and decode a file in the **MeowMeow** encoding scheme.
 While not intended to be useful in and of itself, the program is an
-example of how to structure a small to medium sized C command-line program.
+example of [how to structure a small to medium sized C command-line program][3].
 
 #### Requirements
 
@@ -52,3 +52,4 @@ bytes:
 
 <!-- [1]: https://FIXME/internal/link/MeowMeowEncodingScheme --> 
 [2]: http://www.jabberwocky.com/software/moomooencode.html
+[3]: https://github.com/JnyJny/articles/blob/master/c/multi-file-c-program/article.md
